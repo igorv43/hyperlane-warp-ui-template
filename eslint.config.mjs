@@ -1,5 +1,6 @@
 import { FlatCompat } from '@eslint/eslintrc';
 import js from '@eslint/js';
+import nextPlugin from '@next/eslint-plugin-next';
 import typescriptEslint from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 import globals from 'globals';
@@ -38,6 +39,7 @@ export default [
   ),
   {
     plugins: {
+      '@next/next': nextPlugin,
       '@typescript-eslint': typescriptEslint,
     },
 
