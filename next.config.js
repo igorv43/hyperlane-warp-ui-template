@@ -74,11 +74,44 @@ const securityHeaders = [
 ];
 
 const nextConfig = {
-  webpack(config) {
+  // Otimizações de memória para builds em ambientes com recursos limitados
+  output: 'standalone',
+  
+  // Reduz o uso de memória durante o build
+  experimental: {
+    webpackBuildWorker: false,
+    // Otimizações adicionais
+    optimizePackageImports: [
+      '@chakra-ui/react',
+      '@hyperlane-xyz/widgets',
+      '@solana/wallet-adapter-react',
+      '@tanstack/react-query',
+    ],
+  },
+
+  // Compressão e otimizações
+  compress: true,
+  swcMinify: true,
+
+  webpack(config, { isServer }) {
     config.module.rules.push({
       test: /\.ya?ml$/,
       use: 'yaml-loader',
     });
+
+    // Otimizações de memória para webpack
+    if (!isServer) {
+      config.optimization = {
+        ...config.optimization,
+        // Limita paralelismo para reduzir uso de memória
+        splitChunks: {
+          ...config.optimization.splitChunks,
+          maxAsyncRequests: 20,
+          maxInitialRequests: 20,
+        },
+      };
+    }
+
     return config;
   },
 
