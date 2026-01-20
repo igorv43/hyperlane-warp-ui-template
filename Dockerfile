@@ -19,6 +19,8 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # Copiar arquivos de dependências
 COPY package.json pnpm-lock.yaml* ./
+# Copiar patches (necessário para pnpm install com patchedDependencies)
+COPY patches ./patches
 # Instalar apenas dependências de produção se necessário
 # Para build, precisamos de devDependencies também
 RUN pnpm install --frozen-lockfile
