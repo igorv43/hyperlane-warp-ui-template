@@ -8,10 +8,15 @@ services:
     ports:
       - "3000:3000"
     environment:
+      # Variáveis obrigatórias
       - NODE_ENV=production
       - NEXT_TELEMETRY_DISABLED=1
-      # Adicione outras variáveis de ambiente aqui
-      # - NEXT_PUBLIC_API_URL=https://api.example.com
+      - PORT=3000
+      - HOSTNAME=0.0.0.0
+      # Variáveis opcionais (descomente se necessário)
+      # - NEXT_PUBLIC_WALLET_CONNECT_ID=seu-project-id
+      # - NEXT_PUBLIC_REGISTRY_URL=https://registry.example.com
+      # - SENTRY_AUTH_TOKEN=seu-token-sentry
     restart: unless-stopped
     # Limites de recursos (ajuste conforme necessário)
     deploy:
