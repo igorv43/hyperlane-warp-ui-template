@@ -89,27 +89,89 @@ const nextConfig = {
     ],
   },
 
-  // Compressão e otimizações
+  // Compressão (swcMinify removido - obsoleto no Next.js 15, minificação é automática)
   compress: true,
-  swcMinify: true,
 
-  webpack(config, { isServer }) {
+  webpack(config, { isServer, dev, isServerCompilation }) {
     config.module.rules.push({
       test: /\.ya?ml$/,
       use: 'yaml-loader',
     });
 
-    // Otimizações de memória para webpack
+    // Desabilita source maps completamente durante build (economiza MUITA memória)
+    if (!dev) {
+      config.devtool = false;
+    }
+
+    // Desabilita cache durante build para economizar memória
+    if (!dev && process.env.NODE_ENV === 'production') {
+      config.cache = false;
+    } else if (config.cache) {
+      config.cache = {
+        ...config.cache,
+        maxMemoryGenerations: 1,
+      };
+    }
+
+    // Otimizações agressivas de memória para webpack
     if (!isServer) {
       config.optimization = {
         ...config.optimization,
-        // Limita paralelismo para reduzir uso de memória
+        // Reduz paralelismo drasticamente
         splitChunks: {
           ...config.optimization.splitChunks,
-          maxAsyncRequests: 20,
-          maxInitialRequests: 20,
+          maxAsyncRequests: 10,
+          maxInitialRequests: 10,
+          chunks: 'all',
+          minSize: 20000,
+          maxSize: 200000, // Reduzido para ~200KB por chunk
+          cacheGroups: {
+            default: {
+              minChunks: 2,
+              priority: -20,
+              reuseExistingChunk: true,
+            },
+            vendor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: 'vendors',
+              priority: -10,
+              chunks: 'all',
+              minSize: 50000,
+              maxSize: 200000, // Chunks menores = menos memória
+            },
+            // Separar pacotes grandes em chunks individuais menores
+            chakra: {
+              test: /[\\/]node_modules[\\/]@chakra-ui[\\/]/,
+              name: 'chakra',
+              priority: 10,
+              chunks: 'all',
+              enforce: true,
+            },
+            solana: {
+              test: /[\\/]node_modules[\\/]@solana[\\/]/,
+              name: 'solana',
+              priority: 10,
+              chunks: 'all',
+              enforce: true,
+            },
+          },
         },
+        moduleIds: 'deterministic',
+        // Reduz uso de memória na minificação
+        minimize: true,
       };
+
+      // Limita paralelismo do webpack drasticamente
+      config.parallelism = 1;
+    }
+
+    // Para server-side também reduzir paralelismo
+    if (isServer) {
+      config.optimization = {
+        ...config.optimization,
+        minimize: false, // Não precisa minificar server-side
+      };
+      config.parallelism = 1;
     }
 
     return config;
@@ -137,6 +199,15 @@ const sentryOptions = {
   authToken: process.env.SENTRY_AUTH_TOKEN,
   hideSourceMaps: true,
   tunnelRoute: '/monitoring-tunnel',
+  // Desabilita geração de source maps durante build (economiza memória)
+  disableServerWebpackPlugin: !process.env.SENTRY_AUTH_TOKEN,
+  disableClientWebpackPlugin: !process.env.SENTRY_AUTH_TOKEN,
+  // Desabilita source maps completamente se não houver token
+  ...(!process.env.SENTRY_AUTH_TOKEN && {
+    sourcemaps: {
+      disable: true,
+    },
+  }),
   bundleSizeOptimizations: {
     excludeDebugStatements: true,
     excludeReplayIframe: true,
