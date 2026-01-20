@@ -74,13 +74,15 @@ USER nextjs
 EXPOSE 3000
 
 # Variáveis de ambiente para produção
+# PORT pode ser sobrescrito pelo EasyPanel (geralmente 80 ou 3000)
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
 # Healthcheck para EasyPanel monitorar a aplicação
+# Usa a variável PORT para ser compatível com qualquer porta configurada
 # Aumentado start-period para dar mais tempo para a aplicação iniciar
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1
+  CMD sh -c 'wget --no-verbose --tries=1 --spider http://localhost:${PORT:-3000}/api/health || exit 1'
 
 # O standalone cria um server.js na raiz do diretório standalone
 CMD ["node", "server.js"]
