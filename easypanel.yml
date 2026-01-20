@@ -1,0 +1,48 @@
+# EasyPanel Configuration for Hyperlane Warp UI
+# Este arquivo pode ser usado como referência para configurar o projeto no EasyPanel
+
+name: hyperlane-warp-ui
+description: Hyperlane Warp Route UI Template
+
+# Configurações de Build
+build:
+  type: dockerfile
+  dockerfile: Dockerfile
+  context: .
+
+# Configurações de Runtime
+runtime:
+  port: 3000
+  env:
+    - NODE_ENV=production
+    - NEXT_TELEMETRY_DISABLED=1
+    # Adicione outras variáveis de ambiente necessárias:
+    # - NEXT_PUBLIC_WALLET_CONNECT_ID=your-project-id
+    # - NEXT_PUBLIC_REGISTRY_URL=https://registry.example.com
+    # - SENTRY_AUTH_TOKEN=your-sentry-token
+
+# Recursos recomendados
+resources:
+  build:
+    memory: 4G  # Mínimo recomendado: 4GB para o build
+    cpu: 2      # Mínimo recomendado: 2 cores
+  runtime:
+    memory: 1G  # Mínimo recomendado: 1GB para runtime
+    cpu: 1      # Mínimo recomendado: 1 core
+
+# Health Check
+healthcheck:
+  path: /api/health
+  interval: 30s
+  timeout: 3s
+  start_period: 40s
+  retries: 3
+
+# Configurações de rede
+network:
+  ports:
+    - container: 3000
+      protocol: http
+
+# Restart policy
+restart: unless-stopped
