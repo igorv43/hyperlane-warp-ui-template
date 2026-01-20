@@ -74,6 +74,24 @@ const securityHeaders = [
 ];
 
 const nextConfig = {
+  // CRÍTICO: Necessário para o Dockerfile funcionar
+  // O modo standalone cria um server.js que é usado pelo container
+  output: 'standalone',
+
+  // Desabilita linting durante o build para acelerar em produção
+  // O linting pode ser feito separadamente via 'pnpm lint'
+  eslint: {
+    // Durante o build de produção, ignora erros de ESLint
+    ignoreDuringBuilds: true,
+  },
+
+  // Desabilita type checking durante o build para acelerar
+  // O type checking pode ser feito separadamente via 'pnpm typecheck'
+  typescript: {
+    // Durante o build de produção, ignora erros de TypeScript
+    ignoreBuildErrors: false, // Mantém habilitado para detectar erros críticos
+  },
+
   webpack(config) {
     config.module.rules.push({
       test: /\.ya?ml$/,
