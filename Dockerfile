@@ -70,19 +70,21 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 # Mudar para usuário não-root
 USER nextjs
 
-# Expor porta (EasyPanel usa esta porta)
-EXPOSE 3000
+# Expor porta (EasyPanel geralmente usa 80)
+# O EXPOSE é apenas informativo, o EasyPanel controla o mapeamento real
+EXPOSE 80
 
 # Variáveis de ambiente para produção
-# PORT pode ser sobrescrito pelo EasyPanel (geralmente 80 ou 3000)
-ENV PORT=3000
+# PORT deve ser definido pelo EasyPanel (geralmente 80)
+# Se não definido, usa 80 como padrão
+ENV PORT=80
 ENV HOSTNAME="0.0.0.0"
 
 # Healthcheck para EasyPanel monitorar a aplicação
-# Tenta porta 80 primeiro (padrão do EasyPanel), depois 3000 como fallback
+# Usa a porta definida em PORT (padrão 80) ou tenta portas alternativas
 # Aumentado start-period para dar mais tempo para a aplicação iniciar
 HEALTHCHECK --interval=30s --timeout=15s --start-period=120s --retries=5 \
-  CMD sh -c 'wget --no-verbose --tries=1 --spider http://localhost:${PORT:-80}/api/health 2>/dev/null || wget --no-verbose --tries=1 --spider http://localhost:80/api/health 2>/dev/null || wget --no-verbose --tries=1 --spider http://localhost:3000/api/health 2>/dev/null || exit 1'
+  CMD sh -c 'port=${PORT:-80}; wget --no-verbose --tries=1 --spider http://localhost:$port/api/health 2>/dev/null || wget --no-verbose --tries=1 --spider http://localhost:80/api/health 2>/dev/null || exit 1'
 
 # O standalone cria um server.js na raiz do diretório standalone
 CMD ["node", "server.js"]

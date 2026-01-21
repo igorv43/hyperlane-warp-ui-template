@@ -3,9 +3,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    # Ports são gerenciados pelo EasyPanel, não defina aqui
-    # ports:
-    #   - "3000:3000"
     environment:
       # Variáveis obrigatórias
       - NODE_ENV=production
