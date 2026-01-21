@@ -127,6 +127,12 @@ const sentryOptions = {
     excludeReplayIframe: true,
     excludeReplayShadowDom: true,
   },
+  // Desabilita completamente se não houver token para evitar travamentos no build
+  disableServerWebpackPlugin: !process.env.SENTRY_AUTH_TOKEN,
+  disableClientWebpackPlugin: !process.env.SENTRY_AUTH_TOKEN,
+  disableSourceMaps: !process.env.SENTRY_AUTH_TOKEN,
+  // Silencia avisos se não houver token
+  silent: !process.env.SENTRY_AUTH_TOKEN,
 };
 
 module.exports = withBundleAnalyzer(withSentryConfig(nextConfig, sentryOptions));
