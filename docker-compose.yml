@@ -1,12 +1,11 @@
-version: '3.8'
-
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
+    # Ports são gerenciados pelo EasyPanel, não defina aqui
+    # ports:
+    #   - "3000:3000"
     environment:
       # Variáveis obrigatórias
       - NODE_ENV=production
