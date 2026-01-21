@@ -130,9 +130,12 @@ const sentryOptions = {
   // Desabilita completamente se não houver token para evitar travamentos no build
   disableServerWebpackPlugin: !process.env.SENTRY_AUTH_TOKEN,
   disableClientWebpackPlugin: !process.env.SENTRY_AUTH_TOKEN,
-  disableSourceMaps: !process.env.SENTRY_AUTH_TOKEN,
-  // Silencia avisos se não houver token
-  silent: !process.env.SENTRY_AUTH_TOKEN,
+  // Desabilita source maps completamente se não houver token
+  ...(!process.env.SENTRY_AUTH_TOKEN && {
+    sourcemaps: {
+      disable: true,
+    },
+  }),
 };
 
 module.exports = withBundleAnalyzer(withSentryConfig(nextConfig, sentryOptions));
