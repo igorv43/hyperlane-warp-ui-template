@@ -7,11 +7,10 @@ import {
   RpcUrlSchema,
 } from '@hyperlane-xyz/sdk';
 import {
-  objFilter,
   objMap,
   promiseObjAll,
   ProtocolType,
-  tryParseJsonOrYaml,
+  tryParseJsonOrYaml
 } from '@hyperlane-xyz/utils';
 import { z } from 'zod';
 import { chains as ChainsTS } from '../../consts/chains.ts';
@@ -54,9 +53,9 @@ export async function assembleChainMetadata(
   }
 
   // Filter out chains that are not in the tokens config
-  registryChainMetadata = objFilter(registryChainMetadata, (c, m): m is ChainMetadata =>
-    chainsInTokens.includes(c),
-  );
+  // registryChainMetadata = objFilter(registryChainMetadata, (c, m): m is ChainMetadata =>
+  //   chainsInTokens.includes(c),
+  // );
 
   // TODO have the registry do this automatically
   registryChainMetadata = await promiseObjAll(

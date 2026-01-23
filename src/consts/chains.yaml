@@ -18,3 +18,100 @@
 #   protocol: ethereum
 #   rpcUrls:
 #     - http: http://127.0.0.1:8555
+
+terraclassic:
+    # bech32 is a valid technical term (Base32 encoding variant used in Cosmos blockchains)
+    bech32Prefix: terra
+    blockExplorers:
+      - apiUrl: https://api.terra-classic.hexxagon.io
+        family: other
+        name: Terra Finder Testnet
+        url: https://finder.terraclassic.community/testnet
+    blocks:
+      confirmations: 1
+      estimateBlockTime: 3
+      reorgPeriod: 1
+    canonicalAsset: uluna
+    chainId: rebel-2
+    contractAddressBytes: 32
+    deployer:
+      name: Mitosis
+      url: https://mitosis.org
+    displayName: Terra classic
+    domainId: 13253
+    gasCurrencyCoinGeckoId: terra-luna
+    gasPrice:
+      amount: "28.325"
+      denom: uluna
+    grpcUrls:
+      - http: https://grpc.terra-classic.hexxagon.dev
+    index:
+      chunk: 5
+      from: 2491
+    isTestnet: false
+    name: terraclassic
+    nativeToken:
+      decimals: 6
+      denom: uluna
+      name: LUNC
+      symbol: LUNC
+    protocol: cosmos
+    restUrls:
+      - http: https://lcd.luncblaze.com
+    rpcUrls:
+      - http: https://rpc.luncblaze.com
+    
+    slip44: 330
+    technicalStack: other
+    transactionOverrides:
+      gasPrice: "28.325"
+    logoURI: https://raw.githubusercontent.com/classic-terra/assets/refs/heads/master/icon/svg/TerraClassic.svg
+
+terraclassictestnet:
+    # bech32 is a valid technical term (Base32 encoding variant used in Cosmos blockchains)
+    bech32Prefix: terra
+    blockExplorers:
+      - apiUrl: https://api.terra-classic.hexxagon.io
+        family: other
+        name: Terra Finder Testnet
+        url: https://finder.terraclassic.community/testnet
+    blocks:
+      confirmations: 1
+      estimateBlockTime: 3
+      reorgPeriod: 1
+    canonicalAsset: uluna
+    chainId: rebel-2
+    contractAddressBytes: 32
+    deployer:
+      name: Mitosis
+      url: https://mitosis.org
+    displayName: Terra classic Testnet
+    domainId: 1325
+    gasCurrencyCoinGeckoId: terra-luna
+    gasPrice:
+      amount: "28.325"
+      denom: uluna
+    grpcUrls:
+      - http: https://grpc.terra-classic.hexxagon.dev
+    index:
+      chunk: 5
+      from: 2491
+    isTestnet: true
+    name: terraclassictestnet
+    nativeToken:
+      decimals: 6
+      denom: uluna
+      name: LUNC
+      symbol: LUNC
+    protocol: cosmos
+    restUrls:
+      - http: https://lcd.luncblaze.com
+    rpcUrls:
+      - http: https://rpc.luncblaze.com
+    
+    slip44: 330
+    technicalStack: other
+    transactionOverrides:
+      gasPrice: "28.325"
+    logoURI: https://raw.githubusercontent.com/classic-terra/assets/refs/heads/master/icon/svg/TerraClassic.svg
+
