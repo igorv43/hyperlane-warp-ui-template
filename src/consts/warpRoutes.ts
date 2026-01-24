@@ -53,7 +53,7 @@ export const warpRouteConfigs: WarpCoreConfig = {
   },
   {
     chainName: 'solanatestnet',
-    standard: TokenStandard.EvmHypSynthetic,
+    standard: TokenStandard.SealevelHypSynthetic,
     // Endereço do contrato do token sintético na BSC
     addressOrDenom: 'HNxN3ZSBtD5J2nNF4AATMhuvTWVeHQf18nTtzKtsnkyw',
     name: 'wwwwLUNC',
