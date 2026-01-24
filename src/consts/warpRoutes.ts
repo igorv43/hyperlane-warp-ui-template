@@ -12,6 +12,7 @@ export const warpRouteConfigs: WarpCoreConfig = {
     
     connections: [
       { token: 'ethereum|bsctestnet|0x2144be4477202ba2d50c9a8be3181241878cf7d8' },
+      { token: 'sealevel|solanatestnet|HNxN3ZSBtD5J2nNF4AATMhuvTWVeHQf18nTtzKtsnkyw' }
        
     ],
    
@@ -20,22 +21,7 @@ export const warpRouteConfigs: WarpCoreConfig = {
     decimals: 6,
     logoURI: 'https://raw.githubusercontent.com/classic-terra/assets/60d34b97178cfdcd77fb87d7deeb7d3ab0ede6ee/icon/svg/LUNC.svg',
   },
-  { 
-    chainName: 'terraclassictestnet',
-    standard: TokenStandard.CwHypCollateral,
-    collateralAddressOrDenom: 'uluna',
-    addressOrDenom: 'terra1zlm0h2xu6rhnjchn29hxnpvr74uxxqetar9y75zcehyx2mqezg9slj09ml',
-    
-    connections: [
-      { token: 'sealevel|solanatestnet|HNxN3ZSBtD5J2nNF4AATMhuvTWVeHQf18nTtzKtsnkyw' },
-       
-    ],
-   
-    name: 'LUNC',
-    symbol: 'LUNC',
-    decimals: 6,
-    logoURI: 'https://raw.githubusercontent.com/classic-terra/assets/60d34b97178cfdcd77fb87d7deeb7d3ab0ede6ee/icon/svg/LUNC.svg',
-  },
+  
   // 2. Configuração do token Sintético (o destino em BSC)
   {
     chainName: 'bsctestnet',
@@ -54,10 +40,13 @@ export const warpRouteConfigs: WarpCoreConfig = {
   {
     chainName: 'solanatestnet',
     standard: TokenStandard.SealevelHypSynthetic,
-    // Endereço do contrato do token sintético na BSC
+    // Endereço do mint do token colateral em Solana (Token-2022)
+    // Mint address: 3yhG9dDHVX6K1duf8znEcaJcuTiKSLYvfBD4xy6akxfu
     addressOrDenom: 'HNxN3ZSBtD5J2nNF4AATMhuvTWVeHQf18nTtzKtsnkyw',
-    name: 'wwwwLUNC',
-    symbol: 'wwwwLUNC',
+    // Colateral: SOL (wrapped SOL) - endereço base58 válido para Solana
+    collateralAddressOrDenom: '3yhG9dDHVX6K1duf8znEcaJcuTiKSLYvfBD4xy6akxfu',
+    name: 'wwwwwLUNC',
+    symbol: 'wwwwwLUNC',
     decimals: 6,
     logoURI: 'https://raw.githubusercontent.com/classic-terra/assets/60d34b97178cfdcd77fb87d7deeb7d3ab0ede6ee/icon/svg/LUNC.svg',
     connections: [

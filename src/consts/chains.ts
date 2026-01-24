@@ -3,6 +3,8 @@ import {
   eclipsemainnetAddresses,
   solanamainnet,
   solanamainnetAddresses,
+  solanatestnet,
+  solanatestnetAddresses,
   solaxy,
   solaxyAddresses,
   sonicsvm,
@@ -21,6 +23,11 @@ export const chains: ChainMap<ChainMetadata & { mailbox?: Address }> = {
     ...solanamainnet,
     // SVM chains require mailbox addresses for the token adapters
     mailbox: solanamainnetAddresses.mailbox,
+  },
+  solanatestnet: {
+    ...solanatestnet,
+    // SVM chains require mailbox addresses for the token adapters
+    mailbox: solanatestnetAddresses.mailbox,
   },
   eclipsemainnet: {
     ...eclipsemainnet,
@@ -68,6 +75,7 @@ export const chains: ChainMap<ChainMetadata & { mailbox?: Address }> = {
 export const chainsRentEstimate: ChainMap<bigint> = {
   eclipsemainnet: BigInt(Math.round(0.00004019 * 10 ** 9)),
   solanamainnet: BigInt(Math.round(0.00411336 * 10 ** 9)),
+  solanatestnet: BigInt(Math.round(0.00411336 * 10 ** 9)),
   sonicsvm: BigInt(Math.round(0.00411336 * 10 ** 9)),
   soon: BigInt(Math.round(0.00000355 * 10 ** 9)),
 };
