@@ -20,6 +20,22 @@ export const warpRouteConfigs: WarpCoreConfig = {
     decimals: 6,
     logoURI: 'https://raw.githubusercontent.com/classic-terra/assets/60d34b97178cfdcd77fb87d7deeb7d3ab0ede6ee/icon/svg/LUNC.svg',
   },
+  { 
+    chainName: 'terraclassictestnet',
+    standard: TokenStandard.CwHypCollateral,
+    collateralAddressOrDenom: 'uluna',
+    addressOrDenom: 'terra1zlm0h2xu6rhnjchn29hxnpvr74uxxqetar9y75zcehyx2mqezg9slj09ml',
+    
+    connections: [
+      { token: 'sealevel|solanatestnet|HNxN3ZSBtD5J2nNF4AATMhuvTWVeHQf18nTtzKtsnkyw' },
+       
+    ],
+   
+    name: 'LUNC',
+    symbol: 'LUNC',
+    decimals: 6,
+    logoURI: 'https://raw.githubusercontent.com/classic-terra/assets/60d34b97178cfdcd77fb87d7deeb7d3ab0ede6ee/icon/svg/LUNC.svg',
+  },
   // 2. Configuração do token Sintético (o destino em BSC)
   {
     chainName: 'bsctestnet',
@@ -34,12 +50,33 @@ export const warpRouteConfigs: WarpCoreConfig = {
       { token: 'cosmos|terraclassictestnet|terra1zlm0h2xu6rhnjchn29hxnpvr74uxxqetar9y75zcehyx2mqezg9slj09ml' },
     ],
 
-  }],
+  },
+  {
+    chainName: 'solanatestnet',
+    standard: TokenStandard.EvmHypSynthetic,
+    // Endereço do contrato do token sintético na BSC
+    addressOrDenom: 'HNxN3ZSBtD5J2nNF4AATMhuvTWVeHQf18nTtzKtsnkyw',
+    name: 'wwwwLUNC',
+    symbol: 'wwwwLUNC',
+    decimals: 6,
+    logoURI: 'https://raw.githubusercontent.com/classic-terra/assets/60d34b97178cfdcd77fb87d7deeb7d3ab0ede6ee/icon/svg/LUNC.svg',
+    connections: [
+      { token: 'cosmos|terraclassictestnet|terra1zlm0h2xu6rhnjchn29hxnpvr74uxxqetar9y75zcehyx2mqezg9slj09ml' },
+    ],
+
+  }
+
+ ],
   options: {
     interchainFeeConstants: [
       {
         origin: 'terraclassictestnet',
         destination: 'bsctestnet',
+        amount: 1780832150, // Taxa interchain em microLUNA (uluna)
+        addressOrDenom: 'uluna',
+      },{
+        origin: 'terraclassictestnet',
+        destination: 'solanatestnet',
         amount: 1780832150, // Taxa interchain em microLUNA (uluna)
         addressOrDenom: 'uluna',
       },
@@ -51,7 +88,13 @@ export const warpRouteConfigs: WarpCoreConfig = {
         origin: 'terraclassictestnet',
         destination: 'bsctestnet',
         amount: 383215, // Taxa local em microLUNA (uluna) - valor exigido pelo contrato
+      }, {
+        origin: 'terraclassictestnet',
+        destination: 'solanatestnet',
+        amount: 383215, // Taxa local em microLUNA (uluna) - valor exigido pelo contrato
       },
     ],
   },
 };
+
+//HNxN3ZSBtD5J2nNF4AATMhuvTWVeHQf18nTtzKtsnkyw
