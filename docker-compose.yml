@@ -1,3 +1,8 @@
+# Docker Compose para desenvolvimento/teste LOCAL
+# Este arquivo NÃO é usado pelo EasyPanel
+# O EasyPanel usa o easypanel.yml
+# Use este arquivo apenas para testar localmente: docker-compose up --build
+
 services:
   app:
     build:

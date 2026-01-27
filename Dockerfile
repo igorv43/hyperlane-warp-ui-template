@@ -84,8 +84,9 @@ ENV HOSTNAME="0.0.0.0"
 # Healthcheck para EasyPanel monitorar a aplicação
 # Verifica se o servidor está respondendo na porta configurada
 # Aumentado start-period para dar mais tempo para a aplicação iniciar
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=15s --start-period=120s --retries=5 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT:-4091}/ || exit 1
 
 # O standalone cria um server.js na raiz do diretório standalone
+# Usar exec para garantir que o processo receba sinais corretamente
 CMD ["node", "server.js"]

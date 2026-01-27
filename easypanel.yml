@@ -1,13 +1,16 @@
 # EasyPanel Configuration for Hyperlane Warp UI
 # Formato docker-compose compatível com EasyPanel
+# IMPORTANTE: O EasyPanel gerencia as portas automaticamente
+# NÃO configure portas aqui - configure apenas nas Settings do EasyPanel (Settings -> Network)
+# A porta do container (4091) deve ser configurada na interface do EasyPanel
 
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - "4091:4091"
+    # SEM configuração de portas - o EasyPanel gerencia automaticamente
+    # Removido "ports:" para evitar conflitos
     environment:
       - NODE_ENV=production
       - NEXT_TELEMETRY_DISABLED=1
@@ -19,8 +22,8 @@ services:
       # - SENTRY_AUTH_TOKEN=your-sentry-token
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:4091/"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:${PORT:-4091}/"]
       interval: 30s
       timeout: 10s
-      start_period: 60s
-      retries: 3
+      start_period: 120s
+      retries: 5
