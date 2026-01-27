@@ -74,18 +74,18 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 USER nextjs
 
 # Expor porta (EasyPanel usa esta porta)
-EXPOSE 3000
+EXPOSE 4091
 
 # Variáveis de ambiente para produção
 # PORT pode ser sobrescrito pelo EasyPanel (geralmente 80 ou 3000)
-ENV PORT=3000
+ENV PORT=4091
 ENV HOSTNAME="0.0.0.0"
 
 # Healthcheck para EasyPanel monitorar a aplicação
 # Verifica se o servidor está respondendo na porta configurada
 # Aumentado start-period para dar mais tempo para a aplicação iniciar
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT:-3000}/ || exit 1
+  CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT:-4091}/ || exit 1
 
 # O standalone cria um server.js na raiz do diretório standalone
 CMD ["node", "server.js"]
