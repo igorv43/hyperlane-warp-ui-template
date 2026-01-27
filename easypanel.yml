@@ -1,48 +1,26 @@
 # EasyPanel Configuration for Hyperlane Warp UI
-# Este arquivo pode ser usado como referência para configurar o projeto no EasyPanel
+# Formato docker-compose compatível com EasyPanel
 
-name: hyperlane-warp-ui
-description: Hyperlane Warp Route UI Template
-
-# Configurações de Build
-build:
-  type: dockerfile
-  dockerfile: Dockerfile
-  context: .
-
-# Configurações de Runtime
-runtime:
-  port: 4091
-  env:
-    - NODE_ENV=production
-    - NEXT_TELEMETRY_DISABLED=1
-    - PORT=4091
-    - HOSTNAME=0.0.0.0
-    # Adicione outras variáveis de ambiente necessárias:
-    # - NEXT_PUBLIC_WALLET_CONNECT_ID=your-project-id
-    # - NEXT_PUBLIC_REGISTRY_URL=https://registry.example.com
-    # - SENTRY_AUTH_TOKEN=your-sentry-token
-
-# Recursos recomendados
-resources:
-  build:
-    memory: 4G  # Mínimo recomendado: 4GB para o build
-    cpu: 2      # Mínimo recomendado: 2 cores
-  runtime:
-    memory: 1G  # Mínimo recomendado: 1GB para runtime
-    cpu: 1      # Mínimo recomendado: 1 core
-
-# Health Check
-healthcheck:
-  path: /
-  interval: 30s
-  timeout: 10s
-  start_period: 60s
-  retries: 3
-
-# Configurações de rede
-# Removida a seção network.ports para evitar conflitos
-# O EasyPanel gerencia as portas automaticamente através do runtime.port
-
-# Restart policy
-restart: unless-stopped
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "4091:4091"
+    environment:
+      - NODE_ENV=production
+      - NEXT_TELEMETRY_DISABLED=1
+      - PORT=4091
+      - HOSTNAME=0.0.0.0
+      # Adicione outras variáveis de ambiente necessárias:
+      # - NEXT_PUBLIC_WALLET_CONNECT_ID=your-project-id
+      # - NEXT_PUBLIC_REGISTRY_URL=https://registry.example.com
+      # - SENTRY_AUTH_TOKEN=your-sentry-token
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:4091/"]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 3
