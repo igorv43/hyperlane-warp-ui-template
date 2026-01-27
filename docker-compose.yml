@@ -7,7 +7,7 @@ services:
       # Variáveis obrigatórias
       - NODE_ENV=production
       - NEXT_TELEMETRY_DISABLED=1
-      - PORT=3000
+      - PORT=4091
       - HOSTNAME=0.0.0.0
       # Variáveis opcionais (descomente se necessário)
       # - NEXT_PUBLIC_WALLET_CONNECT_ID=seu-project-id

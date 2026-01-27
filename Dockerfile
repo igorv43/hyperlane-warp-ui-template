@@ -71,11 +71,11 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 USER nextjs
 
 # Expor porta (EasyPanel usa esta porta)
-EXPOSE 3000
+EXPOSE 4091
 
 # Variáveis de ambiente para produção
 # PORT pode ser sobrescrito pelo EasyPanel (geralmente 80 ou 3000)
-ENV PORT=3000
+ENV PORT=4091
 ENV HOSTNAME="0.0.0.0"
 
 # Healthcheck para EasyPanel monitorar a aplicação
