@@ -1,8 +1,8 @@
 # EasyPanel Configuration for Hyperlane Warp UI
 # Formato docker-compose compatível com EasyPanel
 # IMPORTANTE: O EasyPanel gerencia as portas automaticamente
-# NÃO configure portas aqui - configure apenas nas Settings do EasyPanel (Settings -> Network)
-# A porta do container (4091) deve ser configurada na interface do EasyPanel
+# Configure a porta do container (4091) nas Settings do EasyPanel (Settings -> Network)
+# NÃO configure portas aqui para evitar conflitos
 
 services:
   app:
@@ -10,20 +10,19 @@ services:
       context: .
       dockerfile: Dockerfile
     # SEM configuração de portas - o EasyPanel gerencia automaticamente
-    # Removido "ports:" para evitar conflitos
+    # A porta 4091 está configurada no Dockerfile (ENV PORT=4091)
+    # Configure também nas Settings do EasyPanel: Container Port = 4091
     environment:
       - NODE_ENV=production
       - NEXT_TELEMETRY_DISABLED=1
-      - PORT=4091
-      - HOSTNAME=0.0.0.0
+      # PORT e HOSTNAME são definidos no Dockerfile
+      # Configure PORT=4091 nas variáveis de ambiente do EasyPanel se necessário
+      # - PORT=4091
+      # - HOSTNAME=0.0.0.0
       # Adicione outras variáveis de ambiente necessárias:
       # - NEXT_PUBLIC_WALLET_CONNECT_ID=your-project-id
       # - NEXT_PUBLIC_REGISTRY_URL=https://registry.example.com
       # - SENTRY_AUTH_TOKEN=your-sentry-token
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:${PORT:-4091}/"]
-      interval: 30s
-      timeout: 10s
-      start_period: 120s
-      retries: 5
+    # Healthcheck é configurado no Dockerfile
+    # Removido aqui para evitar conflitos com configuração do EasyPanel
