@@ -70,6 +70,10 @@ COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
+# Copiar script de inicialização do contexto de build
+COPY --chown=nextjs:nodejs start-server.sh ./
+RUN chmod +x start-server.sh
+
 # Mudar para usuário não-root
 USER nextjs
 
@@ -87,6 +91,5 @@ ENV HOSTNAME="0.0.0.0"
 HEALTHCHECK --interval=30s --timeout=15s --start-period=120s --retries=5 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT:-4091}/ || exit 1
 
-# O standalone cria um server.js na raiz do diretório standalone
-# Usar exec para garantir que o processo receba sinais corretamente
-CMD ["node", "server.js"]
+# Usar script de inicialização para garantir que variáveis de ambiente sejam aplicadas
+CMD ["./start-server.sh"]
