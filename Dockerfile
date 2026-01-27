@@ -70,26 +70,26 @@ COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Copiar script de inicialização do contexto de build
-COPY --chown=nextjs:nodejs start-server.sh ./
+# Copiar script de inicialização do stage builder (já foi copiado lá com COPY . .)
+COPY --from=builder --chown=nextjs:nodejs /app/start-server.sh ./
 RUN chmod +x start-server.sh
 
 # Mudar para usuário não-root
 USER nextjs
 
 # Expor porta (EasyPanel usa esta porta)
-EXPOSE 4091
+EXPOSE 3000
 
 # Variáveis de ambiente para produção
 # PORT pode ser sobrescrito pelo EasyPanel (geralmente 80 ou 3000)
-ENV PORT=4091
+ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
 # Healthcheck para EasyPanel monitorar a aplicação
 # Verifica se o servidor está respondendo na porta configurada
 # Aumentado start-period para dar mais tempo para a aplicação iniciar
 HEALTHCHECK --interval=30s --timeout=15s --start-period=120s --retries=5 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT:-4091}/ || exit 1
+  CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT:-3000}/ || exit 1
 
 # Usar script de inicialização para garantir que variáveis de ambiente sejam aplicadas
 CMD ["./start-server.sh"]

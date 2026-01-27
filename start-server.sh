@@ -2,7 +2,7 @@
 set -e
 
 # Garantir que PORT e HOSTNAME estão definidos
-export PORT=${PORT:-4091}
+export PORT=${PORT:-3000}
 export HOSTNAME=${HOSTNAME:-0.0.0.0}
 
 # Log para debug

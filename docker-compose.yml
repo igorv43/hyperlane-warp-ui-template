@@ -9,15 +9,15 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "4091:4091"
+      - "3000:3000"
     environment:
       # Variáveis obrigatórias
       - NODE_ENV=production
       - NEXT_TELEMETRY_DISABLED=1
-      - PORT=4091
+      - PORT=3000
       - HOSTNAME=0.0.0.0
       # Variáveis opcionais (descomente se necessário)
-      # - NEXT_PUBLIC_WALLET_CONNECT_ID=seu-project-id
+      - NEXT_PUBLIC_WALLET_CONNECT_ID=terraclassic
       # - NEXT_PUBLIC_REGISTRY_URL=https://registry.example.com
       # - SENTRY_AUTH_TOKEN=seu-token-sentry
     restart: unless-stopped

@@ -1,14 +1,14 @@
 # EasyPanel Configuration for Hyperlane Warp UI
 # Formato docker-compose compatível com EasyPanel
 # IMPORTANTE: O EasyPanel gerencia as portas automaticamente
-# Configure a porta do container (4091) nas Settings do EasyPanel (Settings -> Network)
+# Configure a porta do container (3000) nas Settings do EasyPanel (Settings -> Network)
 # NÃO configure portas aqui para evitar conflitos
 #
 # ⚠️ CONFIGURAÇÃO DE ACESSO EXTERNO (CRÍTICO):
-# 1. No EasyPanel: Settings -> Network -> Container Port: 4091
+# 1. No EasyPanel: Settings -> Network -> Container Port: 3000
 # 2. No EasyPanel: Settings -> Environment Variables -> Adicione:
 #    - HOSTNAME=0.0.0.0 (OBRIGATÓRIO para acesso externo)
-#    - PORT=4091
+#    - PORT=3000
 # 3. Veja CONFIGURAR_ACESSO_EXTERNO_HOSTINGER.md para detalhes completos
 
 services:
@@ -17,14 +17,14 @@ services:
       context: .
       dockerfile: Dockerfile
     # SEM configuração de portas - o EasyPanel gerencia automaticamente
-    # A porta 4091 está configurada no Dockerfile (ENV PORT=4091)
-    # Configure também nas Settings do EasyPanel: Container Port = 4091
+    # A porta 3000 está configurada no Dockerfile (ENV PORT=3000)
+    # Configure também nas Settings do EasyPanel: Container Port = 3000
     environment:
       - NODE_ENV=production
       - NEXT_TELEMETRY_DISABLED=1
       # PORT e HOSTNAME são definidos no Dockerfile
       # ⚠️ IMPORTANTE: Configure estas variáveis no EasyPanel para acesso externo:
-      # - PORT=4091 (já definido no Dockerfile, mas pode sobrescrever)
+      # - PORT=3000 (já definido no Dockerfile, mas pode sobrescrever)
       # - HOSTNAME=0.0.0.0 (CRÍTICO - sem isso, não há acesso externo)
       # Adicione outras variáveis de ambiente necessárias:
       # - NEXT_PUBLIC_WALLET_CONNECT_ID=your-project-id
