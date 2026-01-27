@@ -58,6 +58,9 @@ RUN apk add --no-cache wget
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
+# Definir diretório de trabalho
+WORKDIR /app
+
 # Copiar arquivos necessários para produção (standalone output)
 # O modo standalone já inclui apenas o necessário
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
@@ -71,18 +74,18 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 USER nextjs
 
 # Expor porta (EasyPanel usa esta porta)
-EXPOSE 4091
+EXPOSE 3000
 
 # Variáveis de ambiente para produção
 # PORT pode ser sobrescrito pelo EasyPanel (geralmente 80 ou 3000)
-ENV PORT=4091
+ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
 # Healthcheck para EasyPanel monitorar a aplicação
-# Tenta porta 80 primeiro (padrão do EasyPanel), depois 3000 como fallback
+# Verifica se o servidor está respondendo na porta configurada
 # Aumentado start-period para dar mais tempo para a aplicação iniciar
-HEALTHCHECK --interval=30s --timeout=15s --start-period=120s --retries=5 \
-  CMD sh -c 'wget --no-verbose --tries=1 --spider http://localhost:${PORT:-80}/api/health 2>/dev/null || wget --no-verbose --tries=1 --spider http://localhost:80/api/health 2>/dev/null || wget --no-verbose --tries=1 --spider http://localhost:3000/api/health 2>/dev/null || exit 1'
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT:-3000}/ || exit 1
 
 # O standalone cria um server.js na raiz do diretório standalone
 CMD ["node", "server.js"]
