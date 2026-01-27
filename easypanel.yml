@@ -12,10 +12,12 @@ build:
 
 # Configurações de Runtime
 runtime:
-  port: 3000
+  port: 4091
   env:
     - NODE_ENV=production
     - NEXT_TELEMETRY_DISABLED=1
+    - PORT=4091
+    - HOSTNAME=0.0.0.0
     # Adicione outras variáveis de ambiente necessárias:
     # - NEXT_PUBLIC_WALLET_CONNECT_ID=your-project-id
     # - NEXT_PUBLIC_REGISTRY_URL=https://registry.example.com
@@ -32,17 +34,15 @@ resources:
 
 # Health Check
 healthcheck:
-  path: /api/health
+  path: /
   interval: 30s
-  timeout: 3s
-  start_period: 40s
+  timeout: 10s
+  start_period: 60s
   retries: 3
 
 # Configurações de rede
-network:
-  ports:
-    - container: 3000
-      protocol: http
+# Removida a seção network.ports para evitar conflitos
+# O EasyPanel gerencia as portas automaticamente através do runtime.port
 
 # Restart policy
 restart: unless-stopped
