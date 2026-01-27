@@ -30,10 +30,13 @@ FROM base AS builder
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # Variável de ambiente para limitar memória durante build
-# Ajuste conforme necessário (4096 = 4GB, 6144 = 6GB)
-ENV NODE_OPTIONS="--max-old-space-size=4096"
+# Aumentado para 6144 (6GB) para evitar falhas durante "Collecting page data"
+# Ajuste conforme necessário (4096 = 4GB, 6144 = 6GB, 8192 = 8GB)
+ENV NODE_OPTIONS="--max-old-space-size=6144"
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
+# Desabilitar source maps para acelerar build (opcional, mas reduz tempo)
+ENV NEXT_PRIVATE_STANDALONE=true
 
 # Copiar dependências da stage anterior
 COPY --from=deps /app/node_modules ./node_modules
