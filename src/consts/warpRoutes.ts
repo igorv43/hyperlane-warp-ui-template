@@ -12,6 +12,7 @@ export const warpRouteConfigs: WarpCoreConfig = {
     
     connections: [
       { token: 'ethereum|bsctestnet|0x2144be4477202ba2d50c9a8be3181241878cf7d8' },
+      { token: 'ethereum|sepolia|0x224a4419D7FA69D3bEbAbce574c7c84B48D829b4' },
       { token: 'sealevel|solanatestnet|HNxN3ZSBtD5J2nNF4AATMhuvTWVeHQf18nTtzKtsnkyw' }
        
     ],
@@ -28,8 +29,21 @@ export const warpRouteConfigs: WarpCoreConfig = {
     standard: TokenStandard.EvmHypSynthetic,
     // Endereço do contrato do token sintético na BSC
     addressOrDenom: '0x2144be4477202ba2d50c9a8be3181241878cf7d8',
-    name: 'wwwwLUNC',
+    name: 'Luna Classic',
     symbol: 'wwwwLUNC',
+    decimals: 6,
+    logoURI: 'https://raw.githubusercontent.com/classic-terra/assets/60d34b97178cfdcd77fb87d7deeb7d3ab0ede6ee/icon/svg/LUNC.svg',
+    connections: [
+      { token: 'cosmos|terraclassictestnet|terra1zlm0h2xu6rhnjchn29hxnpvr74uxxqetar9y75zcehyx2mqezg9slj09ml' },
+    ],
+
+  },{
+    chainName: 'sepolia',
+    standard: TokenStandard.EvmHypSynthetic,
+    // Endereço do contrato do token sintético na BSC
+    addressOrDenom: '0x224a4419D7FA69D3bEbAbce574c7c84B48D829b4',
+    name: 'Luna Classic',
+    symbol: 'LUNC',
     decimals: 6,
     logoURI: 'https://raw.githubusercontent.com/classic-terra/assets/60d34b97178cfdcd77fb87d7deeb7d3ab0ede6ee/icon/svg/LUNC.svg',
     connections: [
@@ -45,7 +59,7 @@ export const warpRouteConfigs: WarpCoreConfig = {
     addressOrDenom: 'HNxN3ZSBtD5J2nNF4AATMhuvTWVeHQf18nTtzKtsnkyw',
     // Colateral: SOL (wrapped SOL) - endereço base58 válido para Solana
     collateralAddressOrDenom: '3yhG9dDHVX6K1duf8znEcaJcuTiKSLYvfBD4xy6akxfu',
-    name: 'wwwwwLUNC',
+    name: 'Luna Classic',
     symbol: 'wwwwwLUNC',
     decimals: 6,
     logoURI: 'https://raw.githubusercontent.com/classic-terra/assets/60d34b97178cfdcd77fb87d7deeb7d3ab0ede6ee/icon/svg/LUNC.svg',
@@ -68,7 +82,12 @@ export const warpRouteConfigs: WarpCoreConfig = {
         destination: 'solanatestnet',
         amount: 1780832150, // Taxa interchain em microLUNA (uluna)
         addressOrDenom: 'uluna',
-      },
+      },{
+        origin: 'terraclassictestnet',
+        destination: 'sepolia',
+        amount: 1780832150, // Taxa interchain em microLUNA (uluna)
+        addressOrDenom: 'uluna',
+      }
     ],
     // Taxas locais constantes para evitar simulação problemática
     // O contrato precisa de 283215 uluna para o hook payment
@@ -81,7 +100,11 @@ export const warpRouteConfigs: WarpCoreConfig = {
         origin: 'terraclassictestnet',
         destination: 'solanatestnet',
         amount: 383215, // Taxa local em microLUNA (uluna) - valor exigido pelo contrato
-      },
+      },{
+        origin: 'terraclassictestnet',
+        destination: 'sepolia',
+        amount: 383215, // Taxa local em microLUNA (uluna) - valor exigido pelo contrato
+      }
     ],
   },
 };
