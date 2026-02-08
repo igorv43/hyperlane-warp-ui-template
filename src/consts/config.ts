@@ -11,7 +11,19 @@ const walletConnectProjectId = process?.env?.NEXT_PUBLIC_WALLET_CONNECT_ID || ''
 const transferBlacklist = process?.env?.NEXT_PUBLIC_TRANSFER_BLACKLIST || '';
 const chainWalletWhitelists = JSON.parse(process?.env?.NEXT_PUBLIC_CHAIN_WALLET_WHITELISTS || '{}');
 const rpcOverrides = process?.env?.NEXT_PUBLIC_RPC_OVERRIDES || '';
-
+const allowedChainDomainIdsEnv = process?.env?.NEXT_PUBLIC_ALLOWED_CHAIN_DOMAIN_IDS;
+const allowedChainDomainIds = allowedChainDomainIdsEnv
+  ? (() => {
+      try {
+        const parsed = JSON.parse(allowedChainDomainIdsEnv);
+        return Array.isArray(parsed) && parsed.every((id) => typeof id === 'number')
+          ? (parsed as number[])
+          : null;
+      } catch {
+        return null;
+      }
+    })()
+  : null;
 interface Config {
   addressBlacklist: string[]; // A list of addresses that are blacklisted and cannot be used in the app
   chainWalletWhitelists: ChainMap<string[]>; // A map of chain names to a list of wallet names that work for it
@@ -33,6 +45,7 @@ interface Config {
   walletProtocols: ProtocolType[] | undefined; // Wallet Protocols to show in the wallet connect modal. Leave undefined to include all of them
   rpcOverrides: string; // JSON string containing a map of chain names to an object with an URL for RPC overrides (For an example check the .env.example file)
   enableTrackingEvents: boolean; // Allow tracking events to happen on some actions;
+  allowedChainDomainIds: number[] | null; // Array of domainIds to filter chains in the chain selector modal (e.g., [8453, 478] for base and form)
 }
 
 export const config: Config = Object.freeze({
@@ -62,4 +75,5 @@ export const config: Config = Object.freeze({
   shouldDisableChains: false,
   rpcOverrides,
   enableTrackingEvents: false,
+  allowedChainDomainIds,
 });
