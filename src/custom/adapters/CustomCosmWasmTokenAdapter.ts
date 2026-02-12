@@ -14,6 +14,7 @@ import {
   CwNativeTokenAdapter as SDKCwNativeTokenAdapter,
 } from '@hyperlane-xyz/sdk';
 import type { Address } from '@hyperlane-xyz/utils';
+import { addressToBytes32, strip0x } from '@hyperlane-xyz/utils';
 import { logger } from '../../utils/logger';
 
 /**
@@ -25,10 +26,97 @@ export class CwNativeTokenAdapter extends SDKCwNativeTokenAdapter {
 }
 
 /**
- * Custom CwHypCollateralAdapter que corrige getDenom() e getBalance()
+ * Custom CwHypCollateralAdapter que corrige populateTransferRemoteTx()
  * para suportar tokens CW20 como colateral
  */
 export class CwHypCollateralAdapter extends SDKCwHypCollateralAdapter {
+  /**
+   * Sobrescreve populateTransferRemoteTx() para corrigir o uso de funds quando o colateral é CW20
+   * 
+   * PROBLEMA: O SDK usa collateralDenom nos funds, mas quando o colateral é CW20,
+   * não devemos incluir o endereço do contrato nos funds. As taxas devem vir apenas
+   * de interchainFeeConstants.addressOrDenom (igpDenom).
+   */
+  async populateTransferRemoteTx({
+    destination,
+    recipient,
+    weiAmountOrId,
+    interchainGas,
+  }: {
+    destination: number;
+    recipient: string;
+    weiAmountOrId: string | bigint;
+    interchainGas?: any;
+  }): Promise<any> {
+    // @ts-ignore - cw20adapter é privado mas necessário para obter tokenType
+    const tokenType = await this.cw20adapter.getTokenType();
+    
+    logger.info(
+      `[CwHypCollateralAdapter] populateTransferRemoteTx() called for token ${this.addresses.token} on chain ${this.chainName}`,
+      { tokenType, destination, recipient, weiAmountOrId },
+    );
+    
+    // Se o colateral for CW20, não usar collateralDenom nos funds
+    // As taxas devem vir apenas de interchainFeeConstants (igpDenom)
+    if ('cw20' in tokenType || 'c_w20' in tokenType) {
+      logger.info(
+        `[CwHypCollateralAdapter] populateTransferRemoteTx() for CW20 collateral - using only igpDenom for fees`,
+      );
+      
+      if (!interchainGas) {
+        interchainGas = await this.quoteTransferRemoteGas({ destination });
+      }
+      
+      const { igpQuote: { addressOrDenom: igpDenom, amount: igpAmount } } = interchainGas;
+      
+      if (!igpDenom) {
+        throw new Error('Interchain gas denom required for Cosmos');
+      }
+      
+      // Para CW20 como colateral, os funds devem conter apenas as taxas em igpDenom
+      // NÃO devemos incluir collateralDenom porque é um endereço de contrato, não um denom
+      // O token CW20 será transferido via transfer_remote, não precisa estar nos funds
+      
+      logger.debug(
+        `[CwHypCollateralAdapter] Preparing router transaction with funds: ${igpAmount} ${igpDenom}`,
+      );
+      
+      // @ts-ignore - cw20adapter.prepareRouter é necessário
+      const tx = await this.cw20adapter.prepareRouter(
+        {
+          // eslint-disable-next-line camelcase
+          transfer_remote: {
+            // eslint-disable-next-line camelcase
+            dest_domain: destination,
+            recipient: strip0x(addressToBytes32(recipient)),
+            amount: weiAmountOrId.toString(),
+          },
+        },
+        [
+          {
+            amount: igpAmount.toString(),
+            denom: igpDenom, // uluna das interchainFeeConstants
+          },
+        ],
+      );
+      
+      logger.debug(
+        `[CwHypCollateralAdapter] Router transaction prepared:`,
+        JSON.stringify(tx, null, 2),
+      );
+      
+      return tx;
+    }
+    
+    // Se não for CW20, usa a lógica do pai (native collateral)
+    return super.populateTransferRemoteTx({
+      destination,
+      recipient,
+      weiAmountOrId,
+      interchainGas,
+    });
+  }
+
   /**
    * Sobrescreve getDenom() para suportar CW20 como colateral
    * Quando o token_type é "cw20", retorna o endereço do token colateral
@@ -91,6 +179,146 @@ export class CwHypCollateralAdapter extends SDKCwHypCollateralAdapter {
         error,
       );
       return this.addresses.token;
+    }
+  }
+
+  /**
+   * Sobrescreve populateApproveTx() para gerar transação de aprovação quando o colateral é CW20
+   * 
+   * Para tokens CW20, precisamos gerar uma transação `increase_allowance` no contrato CW20,
+   * dando permissão ao warp router para gastar os tokens do usuário.
+   * 
+   * NOTA: O SDK define populateApproveTx() que lança erro para tokens nativos.
+   * Precisamos sobrescrever para suportar CW20.
+   */
+  // @ts-ignore - SDK define sem parâmetros mas WarpCore chama com parâmetros
+  async populateApproveTx({
+    weiAmountOrId,
+    recipient,
+  }: {
+    weiAmountOrId: string | bigint;
+    recipient: string;
+  }): Promise<any> {
+    try {
+      // @ts-ignore - cw20adapter é privado mas necessário para obter tokenType
+      const tokenType = await this.cw20adapter.getTokenType();
+
+      logger.info(
+        `[CwHypCollateralAdapter] populateApproveTx() called for token ${this.addresses.token} on chain ${this.chainName}`,
+        { tokenType, recipient, weiAmountOrId },
+      );
+
+      // Se o colateral for CW20, gera a transação de aprovação
+      if ('cw20' in tokenType || 'c_w20' in tokenType) {
+        logger.info(
+          `[CwHypCollateralAdapter] populateApproveTx() for CW20 collateral - generating increase_allowance transaction`,
+        );
+
+        // O recipient é o warp router (spender)
+        // O contrato CW20 é this.addresses.token
+
+        // Prepara a transação increase_allowance no contrato CW20
+        // Similar ao CwTokenAdapter.populateApproveTx()
+        const tx = {
+          contractAddress: this.addresses.token, // Contrato CW20 colateral
+          msg: {
+            // eslint-disable-next-line camelcase
+            increase_allowance: {
+              spender: recipient, // Warp router (o recipient passado pelo WarpCore)
+              amount: weiAmountOrId.toString(),
+              expires: {
+                never: {},
+              },
+            },
+          },
+          funds: [], // Não precisa de funds para increase_allowance
+        };
+
+        logger.debug(
+          `[CwHypCollateralAdapter] Approval transaction prepared:`,
+          JSON.stringify(tx, null, 2),
+        );
+
+        return tx;
+      }
+
+      // Se não for CW20, usa a lógica do pai (que lança erro para tokens nativos)
+      // @ts-ignore - SDK define sem parâmetros
+      return super.populateApproveTx({ weiAmountOrId, recipient });
+    } catch (error) {
+      logger.error(
+        `[CwHypCollateralAdapter] Error generating approval transaction:`,
+        error,
+      );
+      throw error;
+    }
+  }
+
+  /**
+   * Sobrescreve isApproveRequired() para verificar allowance quando o colateral é CW20
+   * 
+   * Para tokens CW20, precisamos verificar se o warp router tem allowance suficiente
+   * para gastar os tokens do usuário.
+   * 
+   * NOTA: O SDK define isApproveRequired() sem parâmetros, mas o WarpCore chama com 3.
+   * Usamos @ts-ignore para contornar essa inconsistência.
+   */
+  // @ts-ignore - SDK define sem parâmetros mas WarpCore chama com 3
+  async isApproveRequired(
+    owner?: Address,
+    spender?: Address,
+    weiAmountOrId?: string | bigint,
+  ): Promise<boolean> {
+    try {
+      // @ts-ignore - cw20adapter é privado mas necessário para obter tokenType
+      const tokenType = await this.cw20adapter.getTokenType();
+      
+      logger.info(
+        `[CwHypCollateralAdapter] isApproveRequired() called for owner ${owner}, spender ${spender}, amount ${weiAmountOrId}`,
+      );
+      
+      // Se o colateral for CW20, verifica o allowance
+      if (('cw20' in tokenType || 'c_w20' in tokenType) && owner && spender && weiAmountOrId) {
+        const provider = await this.getProvider();
+        const amount = BigInt(weiAmountOrId.toString());
+        
+        // Consulta o allowance do token CW20 para o spender (warp router)
+        const response = await provider.queryContractSmart(this.addresses.token, {
+          allowance: {
+            owner: owner,
+            spender: spender,
+          },
+        });
+        
+        // @ts-ignore - response pode ser AllowanceResponse
+        const currentAllowance = BigInt((response as { allowance?: string }).allowance || '0');
+        
+        logger.info(
+          `[CwHypCollateralAdapter] Current allowance: ${currentAllowance}, Required: ${amount}, isRequired: ${currentAllowance < amount}`,
+        );
+        
+        // Retorna true se o allowance atual é menor que o necessário
+        return currentAllowance < amount;
+      }
+      
+      // Se não tiver parâmetros ou não for CW20, retorna false (não precisa de approve)
+      if (!owner || !spender || !weiAmountOrId) {
+        logger.debug(
+          `[CwHypCollateralAdapter] isApproveRequired() called without required parameters, returning false`,
+        );
+        return false;
+      }
+      
+      // Se não for CW20, usa a lógica do pai (native tokens não precisam de approve)
+      // @ts-ignore - SDK define sem parâmetros
+      return super.isApproveRequired();
+    } catch (error) {
+      logger.warn(
+        `[CwHypCollateralAdapter] Error checking allowance, assuming approval required:`,
+        error,
+      );
+      // Em caso de erro, assume que precisa de approve para ser seguro
+      return true;
     }
   }
 
