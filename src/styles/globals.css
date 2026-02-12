@@ -10,6 +10,7 @@ html,
 body {
   padding: 0;
   margin: 0;
+background-color: #050508 !important;
 }
 
 a {
@@ -149,7 +150,7 @@ Toasts
 :root {
   --toastify-color-light: #ffffff;
   --toastify-color-dark: #2e3338;
-  --toastify-color-info: #3498db;
+  --toastify-color-info: #2e3338;
   --toastify-color-success: #35d07f;
   --toastify-color-warning: #fcd34d;
   --toastify-color-error: #dc2626;
@@ -210,3 +211,65 @@ Fixes for cosmos chain selection modal
 div[data-floating-ui-portal] > div {
   z-index: 10000;
 }
+
+/*
+Refiner widget z-index override
+===============================
+Needs to be higher than Intercom chatbox (z-index: 2147483000)
+*/
+#refiner-widget-wrapper {
+  z-index: 2147483001 !important;
+}
+
+.connect-wallet-dark button,
+button[data-testid="rk-connect-button"] {
+  background: linear-gradient(
+    180deg,
+    #1a1b22 0%,
+    #12131a 100%
+  ) !important;
+
+  color: #ffffff !important;
+  border-radius: 14px !important;
+  padding: 10px 20px !important;
+  font-weight: 500 !important;
+
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+
+  /* destaque contra fundo espacial */
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* Hover */
+.connect-wallet-dark button:hover,
+button[data-testid="rk-connect-button"]:hover {
+  background: linear-gradient(
+    180deg,
+    #222433 0%,
+    #171826 100%
+  ) !important;
+
+  border-color: rgba(120, 140, 255, 0.35) !important;
+}
+/* Botão */
+.connect-wallet-wrapper button {
+  background: linear-gradient(180deg, #1a1b22, #12131a) !important;
+  color: #ffffff !important;
+  border-radius: 14px !important;
+  border: 1px solid rgba(255,255,255,0.14) !important;
+}
+
+/* Qualquer ícone dentro do botão */
+.connect-wallet-wrapper button svg,
+.connect-wallet-wrapper button svg path,
+.connect-wallet-wrapper button img {
+  fill: #ffffff !important;
+  stroke: #ffffff !important;
+  color: #ffffff !important;
+
+  /* fallback para ícone escuro */
+  filter: brightness(0) invert(1);
+}
+

@@ -245,6 +245,10 @@ async function initWarpContext({
     const multiProvider = new MultiProtocolProvider(chainMetadataWithOverrides);
     const warpCore = WarpCore.FromConfig(multiProvider, coreConfig);
 
+    // Aplicar adapters customizados para corrigir bugs do SDK (CW20 como colateral)
+    const { patchWarpCore } = await import('../custom/patchWarpCore');
+    patchWarpCore(warpCore, multiProvider);
+
     const tokensBySymbolChainMap = assembleTokensBySymbolChainMap(warpCore.tokens, multiProvider);
     const routerAddressesByChainMap = getRouterAddressesByChain(coreConfig.tokens);
     return {
