@@ -4,7 +4,7 @@ import {
   WarpCore,
   WarpTxCategory,
 } from '@hyperlane-xyz/sdk';
-import { toTitleCase, toWei } from '@hyperlane-xyz/utils';
+import { ProtocolType, toTitleCase, toWei } from '@hyperlane-xyz/utils';
 import {
   getAccountAddressForChain,
   useAccounts,
@@ -14,6 +14,7 @@ import {
 import { useCallback, useState } from 'react';
 import { toast } from 'react-toastify';
 import { toastTxSuccess } from '../../components/toast/TxSuccessToast';
+import { useCustomCosmosTransactionFns } from '../../custom/useCustomCosmosTransactionFns';
 import { logger } from '../../utils/logger';
 import { refinerIdentifyAndShowTransferForm } from '../analytics/refiner';
 import { EVENT_NAME } from '../analytics/types';
@@ -42,7 +43,8 @@ export function useTokenTransfer(onDone?: () => void) {
 
   const activeAccounts = useAccounts(multiProvider);
   const activeChains = useActiveChains(multiProvider);
-  const transactionFns = useTransactionFns(multiProvider);
+  // Usar função customizada que suporta múltiplas mensagens no Cosmos
+  const transactionFns = useCustomCosmosTransactionFns(multiProvider);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -103,6 +105,7 @@ async function executeTransfer({
   setIsLoading: (b: boolean) => void;
   onDone?: () => void;
 }) {
+  console.log('igor - Executing transfer...');
   logger.debug('Preparing transfer transaction(s)');
   setIsLoading(true);
   let transferStatus: TransferStatus = TransferStatus.Preparing;
@@ -181,26 +184,166 @@ async function executeTransfer({
 
       hashes.push(hash);
     } else {
-      for (const tx of txs) {
-        updateTransferStatus(
-          transferIndex,
-          (transferStatus = txCategoryToStatuses[tx.category][0]),
-        );
-        const { hash, confirm } = await sendTransaction({
-          tx,
-          chainName: origin,
-          activeChainName: activeChain.chainName,
-        });
-        updateTransferStatus(
-          transferIndex,
-          (transferStatus = txCategoryToStatuses[tx.category][1]),
-        );
-        txReceipt = await confirm();
-        const description = toTitleCase(tx.category);
-        logger.debug(`${description} transaction confirmed, hash:`, hash);
-        toastTxSuccess(`${description} transaction sent!`, hash, origin);
+      // Para Cosmos, combinar múltiplas transações de aprovação em uma única transação multi-message
+      // Verifica se é Cosmos verificando o protocolo ou o tipo das transações
+     
+      console.log('igor - isCosmosProtocol',txs,originProtocol);
+     
+      const isCosmosProtocol =
+        originProtocol === ProtocolType.Cosmos ||
+        originProtocol === ProtocolType.CosmosNative ||
+        (txs.length > 0 &&
+          (txs[0].type === ProviderType.CosmJsWasm ||
+            txs[0].type === ProviderType.CosmJsNative ||
+            txs[0].type === ProviderType.CosmJs));
 
-        hashes.push(hash);
+      if (isCosmosProtocol) {
+        // Filtrar Approval e Transfer de uma única vez para combiná-las em uma transação multi-message
+        const approvalAndTransferTxs = txs.filter(
+          (tx) =>
+            tx.category === WarpTxCategory.Approval ||
+            tx.category === WarpTxCategory.Transfer,
+        );
+
+        console.log('igor - approvalAndTransferTxs', approvalAndTransferTxs);
+        // Se houver Approval e/ou Transfer, combiná-las em uma única transação multi-message
+        if (approvalAndTransferTxs.length > 0) {
+          logger.info(
+            `Combining ${approvalAndTransferTxs.length} approval and transfer transactions into a single multi-message transaction for Cosmos`,
+          );
+
+          // Criar uma transação multi-message combinando todas as mensagens
+          // Para CosmWasm, precisamos criar um array de mensagens
+          const combinedMsgs: any[] = [];
+          let combinedFunds: any[] = [];
+
+          // Adicionar mensagens de approval primeiro
+          approvalAndTransferTxs
+            .filter((tx) => tx.category === WarpTxCategory.Approval)
+            .forEach((tx) => {
+              if (tx.transaction.msg) {
+                combinedMsgs.push({
+                  contractAddress: tx.transaction.contractAddress,
+                  msg: tx.transaction.msg,
+                  funds: tx.transaction.funds || [],
+                });
+              }
+            });
+
+          // Adicionar mensagens de transfer depois
+          approvalAndTransferTxs
+            .filter((tx) => tx.category === WarpTxCategory.Transfer)
+            .forEach((tx) => {
+              if (tx.transaction.msg) {
+                combinedMsgs.push({
+                  contractAddress: tx.transaction.contractAddress,
+                  msg: tx.transaction.msg,
+                  funds: tx.transaction.funds || [],
+                });
+                // Combinar funds da transferência (contém as taxas)
+                if (tx.transaction.funds && tx.transaction.funds.length > 0) {
+                  combinedFunds = [...combinedFunds, ...tx.transaction.funds];
+                }
+              }
+            });
+
+          // Remover duplicatas de funds (mesmo denom)
+          const uniqueFunds = combinedFunds.reduce((acc: any[], fund: any) => {
+            const existing = acc.find((f) => f.denom === fund.denom);
+            if (existing) {
+              existing.amount = (
+                BigInt(existing.amount) + BigInt(fund.amount)
+              ).toString();
+            } else {
+              acc.push({ ...fund });
+            }
+            return acc;
+          }, []);
+
+          // Criar transação combinada usando a primeira transação como base
+          // Passar o array de mensagens diretamente como transaction
+          // A função customizada useCustomCosmosTransactionFns detecta arrays e chama executeMultiple diretamente
+          const baseTx = approvalAndTransferTxs[0];
+          const combinedTx = {
+            ...baseTx,
+            category: WarpTxCategory.Transfer,
+            // Passar o array de mensagens diretamente
+            // Estrutura: [{contractAddress, msg, funds}, {contractAddress, msg, funds}]
+            transaction: combinedMsgs as any,
+          } as any;
+
+          logger.debug(
+            `[useTokenTransfer] Combined ${combinedMsgs.length} messages into single transaction`,
+            { combinedMsgs, uniqueFunds },
+          );
+
+          updateTransferStatus(
+            transferIndex,
+            (transferStatus = txCategoryToStatuses[WarpTxCategory.Transfer][0]),
+          );
+          const { hash, confirm } = await sendTransaction({
+            tx: combinedTx,
+            chainName: origin,
+            activeChainName: activeChain.chainName,
+          });
+          updateTransferStatus(
+            transferIndex,
+            (transferStatus = txCategoryToStatuses[WarpTxCategory.Transfer][1]),
+          );
+          txReceipt = await confirm();
+          const description = toTitleCase(WarpTxCategory.Transfer);
+          logger.debug(`${description} transaction confirmed, hash:`, hash);
+          toastTxSuccess(`${description} transaction sent!`, hash, origin);
+
+          hashes.push(hash);
+        } else {
+          console.log('igor - else',txs);
+          // Se houver apenas uma aprovação ou nenhuma, enviar normalmente
+          for (const tx of txs) {
+            updateTransferStatus(
+              transferIndex,
+              (transferStatus = txCategoryToStatuses[tx.category][0]),
+            );
+            const { hash, confirm } = await sendTransaction({
+              tx,
+              chainName: origin,
+              activeChainName: activeChain.chainName,
+            });
+            updateTransferStatus(
+              transferIndex,
+              (transferStatus = txCategoryToStatuses[tx.category][1]),
+            );
+            txReceipt = await confirm();
+            const description = toTitleCase(tx.category);
+            logger.debug(`${description} transaction confirmed, hash:`, hash);
+            toastTxSuccess(`${description} transaction sent!`, hash, origin);
+
+            hashes.push(hash);
+          }
+        }
+      } else {
+        // Para outros protocolos, enviar normalmente
+        for (const tx of txs) {
+          updateTransferStatus(
+            transferIndex,
+            (transferStatus = txCategoryToStatuses[tx.category][0]),
+          );
+          const { hash, confirm } = await sendTransaction({
+            tx,
+            chainName: origin,
+            activeChainName: activeChain.chainName,
+          });
+          updateTransferStatus(
+            transferIndex,
+            (transferStatus = txCategoryToStatuses[tx.category][1]),
+          );
+          txReceipt = await confirm();
+          const description = toTitleCase(tx.category);
+          logger.debug(`${description} transaction confirmed, hash:`, hash);
+          toastTxSuccess(`${description} transaction sent!`, hash, origin);
+
+          hashes.push(hash);
+        }
       }
     }
 
