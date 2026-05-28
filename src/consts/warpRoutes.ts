@@ -1,10 +1,10 @@
-import { TokenStandard, WarpCoreConfig } from '@hyperlane-xyz/sdk';
+import { WarpCoreConfig } from '@hyperlane-xyz/sdk';
 
 // A list of Warp Route token configs
 // These configs will be merged with the warp routes in the configured registry
 // The input here is typically the output of the Hyperlane CLI warp deploy command
 export const warpRouteConfigs: WarpCoreConfig = {
-  tokens: [{chainName: 'terraclassictestnet', standard: TokenStandard.CW20, collateralAddressOrDenom: 'uluna', addressOrDenom: 'terra1zlm0h2xu6rhnjchn29hxnpvr74uxxqetar9y75zcehyx2mqezg9slj09ml', connections: [{token: 'ethereum|bsctestnet|0x2144be4477202ba2d50c9a8be3181241878cf7d8'}, {token: 'ethereum|sepolia|0x224a4419D7FA69D3bEbAbce574c7c84B48D829b4'}, {token: 'sealevel|solanatestnet|HNxN3ZSBtD5J2nNF4AATMhuvTWVeHQf18nTtzKtsnkyw'}], name: 'LUNC', symbol: 'LUNC', decimals: 6, logoURI: 'https://raw.githubusercontent.com/classic-terra/assets/60d34b97178cfdcd77fb87d7deeb7d3ab0ede6ee/icon/svg/LUNC.svg'}],
+  tokens: [],
   options: {}
 //   tokens: [{ 
 //     chainName: 'terraclassictestnet',
