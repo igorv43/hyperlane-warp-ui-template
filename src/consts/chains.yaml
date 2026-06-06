@@ -38,7 +38,7 @@ terraclassic:
       name: Mitosis
       url: https://mitosis.org
     displayName: Terra classic
-    domainId: 13253
+    domainId: 1325
     gasCurrencyCoinGeckoId: terra-luna
     gasPrice:
       amount: "28.325"
@@ -87,7 +87,7 @@ terraclassictestnet:
       name: Mitosis
       url: https://mitosis.org
     displayName: Terra classic Testnet
-    domainId: 1325
+    domainId: 13253
     gasCurrencyCoinGeckoId: terra-luna
     gasPrice:
       amount: "28.325"
