@@ -57,9 +57,11 @@ terraclassic:
       symbol: LUNC
     protocol: cosmos
     restUrls:
-      - http: https://lcd.luncblaze.com
+      - http: https://terra-classic-lcd.publicnode.com
+      - http: https://lcd.terra-classic.hexxagon.io
     rpcUrls:
-      - http: https://rpc.luncblaze.com
+      - http: https://terra-classic-rpc.publicnode.com:443
+      - http: https://rpc.terra-classic.hexxagon.io
     slip44: 330
     technicalStack: other
     transactionOverrides:
