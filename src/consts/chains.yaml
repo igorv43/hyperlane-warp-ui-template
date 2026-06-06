@@ -25,14 +25,14 @@ terraclassic:
     blockExplorers:
       - apiUrl: https://api.terra-classic.hexxagon.io
         family: other
-        name: Terra Finder Testnet
-        url: https://finder.terraclassic.community/testnet
+        name: Terra Finder
+        url: https://finder.terraclassic.community
     blocks:
       confirmations: 1
       estimateBlockTime: 3
       reorgPeriod: 1
     canonicalAsset: uluna
-    chainId: rebel-2
+    chainId: columbus-5
     contractAddressBytes: 32
     deployer:
       name: Mitosis
@@ -44,10 +44,10 @@ terraclassic:
       amount: "28.325"
       denom: uluna
     grpcUrls:
-      - http: https://grpc.terra-classic.hexxagon.dev
+      - http: https://terra-classic-grpc.publicnode.com:443
     index:
       chunk: 5
-      from: 2491
+      from: 25225477
     isTestnet: false
     name: terraclassic
     nativeToken:
@@ -60,7 +60,6 @@ terraclassic:
       - http: https://lcd.luncblaze.com
     rpcUrls:
       - http: https://rpc.luncblaze.com
-    
     slip44: 330
     technicalStack: other
     transactionOverrides:
