@@ -16,6 +16,23 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      # Build args: o Next.js INLINA NEXT_PUBLIC_* no bundle durante o build,
+      # então precisam ser passados AQUI (no build), não no runtime.
+      # Cada valor vem da Environment Variable de mesmo nome configurada no EasyPanel.
+      # Se uma var não estiver setada, fica vazia e o Dockerfile cai no default do .env.
+      args:
+        - NEXT_PUBLIC_REGISTRY_URL=${NEXT_PUBLIC_REGISTRY_URL}
+        - NEXT_PUBLIC_REGISTRY_BRANCH=${NEXT_PUBLIC_REGISTRY_BRANCH}
+        - NEXT_PUBLIC_GITHUB_PROXY=${NEXT_PUBLIC_GITHUB_PROXY}
+        - NEXT_PUBLIC_WALLET_CONNECT_ID=${NEXT_PUBLIC_WALLET_CONNECT_ID}
+        - NEXT_PUBLIC_ALLOWED_CHAIN_DOMAIN_IDS=${NEXT_PUBLIC_ALLOWED_CHAIN_DOMAIN_IDS}
+        - NEXT_PUBLIC_RPC_OVERRIDES=${NEXT_PUBLIC_RPC_OVERRIDES}
+        - NEXT_PUBLIC_TRANSFER_BLACKLIST=${NEXT_PUBLIC_TRANSFER_BLACKLIST}
+        - NEXT_PUBLIC_CHAIN_WALLET_WHITELISTS=${NEXT_PUBLIC_CHAIN_WALLET_WHITELISTS}
+        - NEXT_PUBLIC_VERSION=${NEXT_PUBLIC_VERSION}
+        - NEXT_PUBLIC_SENTRY_DSN=${NEXT_PUBLIC_SENTRY_DSN}
+        - NEXT_PUBLIC_REFINER_PROJECT_ID=${NEXT_PUBLIC_REFINER_PROJECT_ID}
+        - NEXT_PUBLIC_REFINER_TRANSFER_FORM_ID=${NEXT_PUBLIC_REFINER_TRANSFER_FORM_ID}
     # SEM configuração de portas - o EasyPanel gerencia automaticamente
     # A porta 3000 está configurada no Dockerfile (ENV PORT=3000)
     # Configure também nas Settings do EasyPanel: Container Port = 3000
