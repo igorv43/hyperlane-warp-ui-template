@@ -38,11 +38,45 @@ ENV NODE_ENV=production
 # Desabilitar source maps para acelerar build (opcional, mas reduz tempo)
 ENV NEXT_PRIVATE_STANDALONE=true
 
+# ─────────────────────────────────────────────────────────────────────────────
+# Build-time public config (NEXT_PUBLIC_*)
+# Next.js INLINA essas variáveis no bundle durante `next build` — elas NÃO são
+# lidas em runtime. Por isso devem ser passadas no BUILD, via --build-arg ou pela
+# aba "Build Arguments" do EasyPanel. Args não informados (vazios) caem no .env.
+# ─────────────────────────────────────────────────────────────────────────────
+ARG NEXT_PUBLIC_REGISTRY_URL=
+ARG NEXT_PUBLIC_REGISTRY_BRANCH=
+ARG NEXT_PUBLIC_GITHUB_PROXY=
+ARG NEXT_PUBLIC_WALLET_CONNECT_ID=
+ARG NEXT_PUBLIC_ALLOWED_CHAIN_DOMAIN_IDS=
+ARG NEXT_PUBLIC_RPC_OVERRIDES=
+ARG NEXT_PUBLIC_TRANSFER_BLACKLIST=
+ARG NEXT_PUBLIC_CHAIN_WALLET_WHITELISTS=
+ARG NEXT_PUBLIC_VERSION=
+ARG NEXT_PUBLIC_SENTRY_DSN=
+ARG NEXT_PUBLIC_REFINER_PROJECT_ID=
+ARG NEXT_PUBLIC_REFINER_TRANSFER_FORM_ID=
+
 # Copiar dependências da stage anterior
 COPY --from=deps /app/node_modules ./node_modules
 
-# Copiar código fonte
+# Copiar código fonte (inclui o .env commitado, que serve de fallback)
 COPY . .
+
+# Gravar SOMENTE os build args informados (não-vazios) em .env.local, que tem
+# precedência sobre .env no Next. Args vazios são ignorados, preservando os
+# defaults do .env. (.env.local é criado aqui dentro; o host é dockerignored.)
+RUN : > .env.local && \
+    for v in NEXT_PUBLIC_REGISTRY_URL NEXT_PUBLIC_REGISTRY_BRANCH NEXT_PUBLIC_GITHUB_PROXY \
+             NEXT_PUBLIC_WALLET_CONNECT_ID NEXT_PUBLIC_ALLOWED_CHAIN_DOMAIN_IDS \
+             NEXT_PUBLIC_RPC_OVERRIDES NEXT_PUBLIC_TRANSFER_BLACKLIST \
+             NEXT_PUBLIC_CHAIN_WALLET_WHITELISTS NEXT_PUBLIC_VERSION \
+             NEXT_PUBLIC_SENTRY_DSN NEXT_PUBLIC_REFINER_PROJECT_ID \
+             NEXT_PUBLIC_REFINER_TRANSFER_FORM_ID; do \
+      eval "val=\$$v"; \
+      if [ -n "$val" ]; then echo "$v=$val" >> .env.local; fi; \
+    done && \
+    echo "==== .env.local (build-arg overrides) ====" && cat .env.local && echo "==========================================="
 
 # Build da aplicação
 # O next.config.js já está configurado com output: 'standalone'

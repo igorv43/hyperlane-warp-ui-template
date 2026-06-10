@@ -7,6 +7,7 @@ import {
   RpcUrlSchema,
 } from '@hyperlane-xyz/sdk';
 import {
+  objFilter,
   objMap,
   promiseObjAll,
   ProtocolType,
@@ -52,10 +53,25 @@ export async function assembleChainMetadata(
     registryChainMetadata = publishedChainMetadata;
   }
 
-  // Filter out chains that are not in the tokens config
-  // registryChainMetadata = objFilter(registryChainMetadata, (c, m): m is ChainMetadata =>
-  //   chainsInTokens.includes(c),
-  // );
+  // The registry is synced with the upstream Hyperlane registry, which includes chains whose
+  // metadata uses enum values added in newer SDKs (e.g. technicalStack 'seismic',
+  // blockExplorers.family 'tronscan'). This app pins an older @hyperlane-xyz/sdk, whose
+  // ChainMetadataSchema rejects those values — and a single invalid chain makes the
+  // MultiProtocolProvider constructor throw, crashing the whole app. Drop chains this SDK
+  // version can't parse; the chains the app actually needs (those in its warp routes) are
+  // standard and validate fine.
+  registryChainMetadata = objFilter(
+    registryChainMetadata,
+    (chainName, metadata): metadata is ChainMetadata => {
+      const parsed = ChainMetadataSchema.safeParse(metadata);
+      if (parsed.success) return true;
+      logger.warn(
+        `Dropping registry chain "${chainName}" incompatible with this SDK:`,
+        parsed.error.issues?.[0]?.message,
+      );
+      return false;
+    },
+  );
 
   // TODO have the registry do this automatically
   registryChainMetadata = await promiseObjAll(
