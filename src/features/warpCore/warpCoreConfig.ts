@@ -41,6 +41,22 @@ export async function assembleWarpCoreConfig(
     registryWarpRoutes = publishedRegistryWarpRoutes;
   }
 
+  // The registry is synced with the upstream Hyperlane registry, which includes warp routes
+  // whose tokens use standards/fields newer than this app's pinned @hyperlane-xyz/sdk
+  // (e.g. EvmM0Portal, TronHypCollateral, EvmHypCrossCollateralRouter, object-valued `scale`).
+  // WarpCore.FromConfig validates the entire config, so a single incompatible route would throw
+  // and crash the app. Drop routes this SDK version can't parse; the app's own routes
+  // (Terra Classic) use standard token types and validate fine.
+  registryWarpRoutes = objFilter(
+    registryWarpRoutes,
+    (routeId, routeConfig): routeConfig is WarpCoreConfig => {
+      const parsed = WarpCoreConfigSchema.safeParse(routeConfig);
+      if (parsed.success) return true;
+      logger.warn(`Dropping registry warp route "${routeId}" incompatible with this SDK version`);
+      return false;
+    },
+  );
+
   let filteredRegistryConfigMap = warpRouteWhitelist
     ? filterToIds(registryWarpRoutes, warpRouteWhitelist)
     : registryWarpRoutes;
