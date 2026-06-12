@@ -13,8 +13,8 @@ export default function Document() {
         <link rel="manifest" href="/site.webmanifest" />
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color={BRAND_COLOR} />
         <link rel="shortcut icon" href="/favicon.png" />
-        <meta name="msapplication-TileColor" content="#ffffff" />
-        <meta name="theme-color" content="#ffffff" />
+        <meta name="msapplication-TileColor" content="#0B0E1A" />
+        <meta name="theme-color" content="#0B0E1A" />
 
         <meta name="application-name" content={APP_NAME} />
         <meta name="keywords" content={APP_NAME + ' Hyperlane Token Bridge Interchain App'} />
