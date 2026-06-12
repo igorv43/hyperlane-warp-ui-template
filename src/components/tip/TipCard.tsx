@@ -11,7 +11,9 @@ export function TipCard() {
   if (!show) return null;
   return (
     <Card className="w-100 p-2 sm:w-[31rem]">
-      <h2 className="text-primary-500">One bridge. Multiple chains</h2>
+      <h2 className="w-fit bg-gradient-to-r from-accent-600 to-primary-500 bg-clip-text font-semibold text-transparent">
+        One bridge. Multiple chains
+      </h2>
       <div className="flex items-end justify-between">
         <p className="mt-1 max-w-[75%] text-xs">
          Transfer assets from Terra Classic to Ethereum, Solana, and BNB Chain through trust-minimized, permissionless interchain infrastructure.
