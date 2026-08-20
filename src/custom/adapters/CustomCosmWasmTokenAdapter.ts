@@ -18,11 +18,57 @@ import { addressToBytes32, strip0x } from '@hyperlane-xyz/utils';
 import { logger } from '../../utils/logger';
 
 /**
+ * IGP de cada chain Cosmos (endereço de infra — os VALORES da taxa são cotados
+ * on-chain na hora, dinâmicos, como já acontece em BSC/ETH/Solana).
+ */
+const COSMOS_IGP: Record<string, string> = {
+  terraclassic: 'terra1taunhg629rssf3g939nqr0h594q5mssrzdj5lkx2hygmxmh72ghqeqqnvz',
+};
+
+/**
+ * Cota o IGP Cosmos on-chain: lê o gás cobrado do domínio (gas_for_domain,
+ * com fallback no default_gas) e pede quote_gas_payment. Substitui as
+ * interchainFeeConstants fixas do registry — o SDK lança "not implemented" p/ CW.
+ */
+async function quoteCosmosIgp(
+  chainName: string,
+  provider: any,
+  destination: number,
+): Promise<{ igpQuote: { amount: bigint; addressOrDenom: string } }> {
+  const igp = COSMOS_IGP[chainName];
+  if (!igp) throw new Error(`IGP não configurado para a chain ${chainName}`);
+  let gas: string;
+  try {
+    const r = await provider.queryContractSmart(igp, {
+      igp: { gas_for_domain: { domains: [destination] } },
+    });
+    const entry = (r.gas ?? []).find((g: any) => Number(g[0]) === destination);
+    if (!entry) throw new Error('sem gás específico p/ o domínio');
+    gas = entry[1].toString();
+  } catch {
+    const d = await provider.queryContractSmart(igp, { igp: { default_gas: {} } });
+    gas = d.gas.toString();
+  }
+  const q = await provider.queryContractSmart(igp, {
+    igp: { quote_gas_payment: { dest_domain: destination, gas_amount: gas } },
+  });
+  // +2% de folga: o oracle pode atualizar entre a cotação e a inclusão da tx;
+  // o excedente vai para o beneficiary do IGP (o vault) — não se perde.
+  const amount = (BigInt(q.gas_needed) * 102n) / 100n;
+  logger.info(
+    `[quoteCosmosIgp] ${chainName} → dom ${destination}: gás ${gas} → ${amount} uluna (on-chain, dinâmico)`,
+  );
+  return { igpQuote: { amount, addressOrDenom: 'uluna' } };
+}
+
+/**
  * Custom CwNativeTokenAdapter que corrige métodos se necessário
- * (por enquanto mantém a mesma implementação, mas pode ser estendido)
  */
 export class CwNativeTokenAdapter extends SDKCwNativeTokenAdapter {
-  // Pode ser estendido no futuro se necessário
+  /** Cotação dinâmica do IGP (o SDK lança "not implemented" p/ CW). */
+  async quoteTransferRemoteGas({ destination }: { destination: number }): Promise<any> {
+    return quoteCosmosIgp(this.chainName, await this.getProvider(), destination);
+  }
 }
 
 /**
@@ -30,6 +76,11 @@ export class CwNativeTokenAdapter extends SDKCwNativeTokenAdapter {
  * para suportar tokens CW20 como colateral
  */
 export class CwHypCollateralAdapter extends SDKCwHypCollateralAdapter {
+  /** Cotação dinâmica do IGP (o SDK lança "not implemented" p/ CW). */
+  async quoteTransferRemoteGas({ destination }: { destination: number }): Promise<any> {
+    return quoteCosmosIgp(this.chainName, await this.getProvider(), destination);
+  }
+
   /**
    * Sobrescreve populateTransferRemoteTx() para corrigir o uso de funds quando o colateral é CW20
    * 
