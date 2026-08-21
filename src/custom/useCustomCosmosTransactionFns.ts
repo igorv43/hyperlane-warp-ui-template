@@ -18,6 +18,7 @@ import { useChains } from '@cosmos-kit/react';
 import { useTransactionFns, useCosmosTransactionFns, getChainsForProtocol } from '@hyperlane-xyz/widgets';
 import type { MultiProtocolProvider } from '@hyperlane-xyz/sdk';
 import { useMemo, useCallback } from 'react';
+import { TX_MEMO } from '../consts/txMemo';
 import { buildCosmosFeeMsg } from '../features/transfer/adminFee/build';
 import type { AdminFeeQuote } from '../features/transfer/adminFee/quote';
 import { logger } from '../utils/logger';
@@ -111,10 +112,10 @@ export function useCustomCosmosTransactionFns(multiProvider: MultiProtocolProvid
         logger.debug(
           `[useCustomCosmosTransactionFns] +taxa administrativa (${feeQuote.amountHuman}) via signAndBroadcast — ${encoded.length} msgs, 1 assinatura`,
         );
-        executionResult = await client.signAndBroadcast(senderAddr, encoded, 'auto');
+        executionResult = await client.signAndBroadcast(senderAddr, encoded, 'auto', TX_MEMO);
       } else {
         // Sem taxa: caminho original (executeMultiple com o array de mensagens).
-        executionResult = await client.executeMultiple(senderAddr, tx.transaction, 'auto');
+        executionResult = await client.executeMultiple(senderAddr, tx.transaction, 'auto', TX_MEMO);
       }
 
       const txDetails = await client.getTx(executionResult.transactionHash);
