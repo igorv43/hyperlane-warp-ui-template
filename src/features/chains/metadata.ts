@@ -10,7 +10,6 @@ import {
   objFilter,
   objMap,
   promiseObjAll,
-  ProtocolType,
   tryParseJsonOrYaml
 } from '@hyperlane-xyz/utils';
 import { z } from 'zod';
