@@ -78,6 +78,11 @@ const nextConfig = {
   // O modo standalone cria um server.js que é usado pelo container
   output: 'standalone',
 
+  // Fixa a raiz do file-tracing na pasta do projeto. Sem isso o Next infere a raiz
+  // por lockfiles e pode escolher um diretório ACIMA do projeto (ex.: /home/lunc),
+  // fazendo o passo "collecting build traces" varrer a home inteira e travar o build.
+  outputFileTracingRoot: __dirname,
+
   // Desabilita linting durante o build para acelerar em produção
   // O linting pode ser feito separadamente via 'pnpm lint'
   eslint: {
