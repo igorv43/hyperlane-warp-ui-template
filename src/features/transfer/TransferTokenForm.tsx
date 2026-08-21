@@ -61,6 +61,8 @@ import {
 } from '../tokens/hooks';
 import { useTokenPrice } from '../tokens/useTokenPrice';
 import { WalletConnectionWarning } from '../wallet/WalletConnectionWarning';
+import { ADMIN_FEE_USD } from '../../consts/adminFee';
+import { useAdminFeeQuote } from './adminFee/useAdminFeeQuote';
 import { FeeSectionButton } from './FeeSectionButton';
 import { RecipientConfirmationModal } from './RecipientConfirmationModal';
 import { getInterchainQuote, getTotalFee, getTransferToken } from './fees';
@@ -627,8 +629,9 @@ function ReviewDetails({
   routeOverrideToken: Token | null;
 }) {
   const { values } = useFormikContext<TransferFormValues>();
-  const { amount, destination, tokenIndex } = values;
+  const { amount, destination, tokenIndex, origin } = values;
   const warpCore = useWarpCore();
+  const { feeQuote: adminFee, enabled: adminFeeEnabled } = useAdminFeeQuote(origin);
   const originToken = routeOverrideToken || getTokenByIndex(warpCore, tokenIndex);
   const originTokenSymbol = originToken?.symbol || '';
   const connection = originToken?.getConnectionForChain(destination);
@@ -766,11 +769,24 @@ function ReviewDetails({
                       }`}</span>
                     </p>
                   )}
+                  {adminFeeEnabled && (
+                    <p className="flex">
+                      <span className="min-w-[7.5rem]">{`Administration Fee ($${ADMIN_FEE_USD.toFixed(2)})`}</span>
+                      <span>{adminFee ? `~${adminFee.amountHuman}` : 'calculating…'}</span>
+                    </p>
+                  )}
                 </div>
               </div>
             </>
           )}
         </div>
+        {adminFeeEnabled && (
+          <p className="mt-2 px-0.5 text-xs leading-snug text-gray-500">
+            {`Includes a fixed administration fee of $${ADMIN_FEE_USD.toFixed(2)}${
+              adminFee ? ` (~${adminFee.amountHuman})` : ''
+            }, charged within the same transfer (single approval) to keep this interface running.`}
+          </p>
+        )}
       </div>
     </>
   );

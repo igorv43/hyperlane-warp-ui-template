@@ -101,11 +101,10 @@ export async function assembleChainMetadata(
 
     if (!overridesUrl) return metadata;
 
-    // Only EVM supports fallback transport, so we are putting the override at the end
-    const rpcUrls =
-      metadata.protocol === ProtocolType.Ethereum
-        ? [...metadata.rpcUrls, overridesUrl]
-        : [overridesUrl, ...metadata.rpcUrls];
+    // O RPC informado pelo operador (override) deve ser o PRIMÁRIO em qualquer
+    // protocolo — senão um RPC público do registry (ex.: bsc.drpc.org) é tentado
+    // primeiro e dá 429. Os do registry ficam como fallback depois dele.
+    const rpcUrls = [overridesUrl, ...metadata.rpcUrls];
 
     return { ...metadata, rpcUrls };
   });

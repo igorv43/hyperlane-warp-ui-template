@@ -11,11 +11,14 @@ import {
   useActiveChains,
   useTransactionFns,
 } from '@hyperlane-xyz/widgets';
+import { PublicKey } from '@solana/web3.js';
 import { useCallback, useState } from 'react';
 import { toast } from 'react-toastify';
 import { toastTxSuccess } from '../../components/toast/TxSuccessToast';
-import { useCustomCosmosTransactionFns } from '../../custom/useCustomCosmosTransactionFns';
+import { useCustomTransactionFns } from '../../custom/useCustomTransactionFns';
 import { logger } from '../../utils/logger';
+import { buildSolanaFeeInstruction } from './adminFee/build';
+import { quoteAdminFee, AdminFeeQuote } from './adminFee/quote';
 import { refinerIdentifyAndShowTransferForm } from '../analytics/refiner';
 import { EVENT_NAME } from '../analytics/types';
 import { trackEvent } from '../analytics/utils';
@@ -43,8 +46,8 @@ export function useTokenTransfer(onDone?: () => void) {
 
   const activeAccounts = useAccounts(multiProvider);
   const activeChains = useActiveChains(multiProvider);
-  // Usar função customizada que suporta múltiplas mensagens no Cosmos
-  const transactionFns = useCustomCosmosTransactionFns(multiProvider);
+  // Fns customizadas: Cosmos (multi-message + taxa) e EVM (EIP-5792 + taxa)
+  const transactionFns = useCustomTransactionFns(multiProvider);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -129,6 +132,18 @@ async function executeTransfer({
     const activeChain = activeChains.chains[originProtocol];
     const sender = getAccountAddressForChain(multiProvider, origin, activeAccounts.accounts);
     if (!sender) throw new Error('No active account found for origin chain');
+
+    // Taxa administrativa (mantém a UI no ar): cotada AGORA com preço vivo do nativo
+    // da origem. null = taxa desligada nesta chain (sem carteira) ou preço indisponível
+    // (aí a transferência segue sem taxa — nunca travamos o usuário por um soluço de preço).
+    let feeQuote: AdminFeeQuote | null = null;
+    try {
+      feeQuote = await quoteAdminFee(origin);
+      if (feeQuote)
+        logger.debug(`[adminFee] ${feeQuote.feeUsd} USD = ${feeQuote.amountHuman} (${origin})`);
+    } catch (e) {
+      logger.warn('[adminFee] falha ao cotar taxa — seguindo sem taxa', e);
+    }
 
     const isCollateralSufficient = await warpCore.isDestinationCollateralSufficient({
       originTokenAmount,
@@ -270,6 +285,8 @@ async function executeTransfer({
             // Passar o array de mensagens diretamente
             // Estrutura: [{contractAddress, msg, funds}, {contractAddress, msg, funds}]
             transaction: combinedMsgs as any,
+            // Taxa administrativa: o custom cosmos fn soma um MsgSend na MESMA tx (1 assinatura)
+            adminFee: feeQuote || undefined,
           } as any;
 
           logger.debug(
@@ -322,8 +339,29 @@ async function executeTransfer({
           }
         }
       } else {
-        // Para outros protocolos, enviar normalmente
+        // Para outros protocolos (EVM e Solana), enviar normalmente
         for (const tx of txs) {
+          // Taxa administrativa: anexar/injetar SÓ na transação de TRANSFERÊNCIA
+          // (nunca na aprovação ERC20). Aprovação segue sem taxa.
+          if (feeQuote && tx.category === WarpTxCategory.Transfer) {
+            if (originProtocol === ProtocolType.Ethereum) {
+              // EVM: o custom fn (sendWithFee) lê isto e faz o batch EIP-5792 (1 aprovação)
+              (tx as any).adminFee = feeQuote;
+            } else if (originProtocol === ProtocolType.Sealevel) {
+              // Solana: injeta a instrução da taxa no MESMO Transaction (1 assinatura)
+              try {
+                const solTx: any = tx.transaction;
+                if (solTx && typeof solTx.add === 'function') {
+                  solTx.add(buildSolanaFeeInstruction(new PublicKey(sender), feeQuote));
+                  logger.debug(`[adminFee][solana] taxa ${feeQuote.amountHuman} injetada na tx`);
+                } else {
+                  logger.warn('[adminFee][solana] Transaction não-legacy — taxa pulada nesta tx');
+                }
+              } catch (e) {
+                logger.warn('[adminFee][solana] falha ao injetar taxa — seguindo sem taxa', e);
+              }
+            }
+          }
           updateTransferStatus(
             transferIndex,
             (transferStatus = txCategoryToStatuses[tx.category][0]),

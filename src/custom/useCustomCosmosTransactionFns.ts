@@ -18,6 +18,8 @@ import { useChains } from '@cosmos-kit/react';
 import { useTransactionFns, useCosmosTransactionFns, getChainsForProtocol } from '@hyperlane-xyz/widgets';
 import type { MultiProtocolProvider } from '@hyperlane-xyz/sdk';
 import { useMemo, useCallback } from 'react';
+import { buildCosmosFeeMsg } from '../features/transfer/adminFee/build';
+import type { AdminFeeQuote } from '../features/transfer/adminFee/quote';
 import { logger } from '../utils/logger';
 
 /**
@@ -86,14 +88,34 @@ export function useCustomCosmosTransactionFns(multiProvider: MultiProtocolProvid
 
       const { getSigningCosmWasmClient } = chainContext;
       const client = await getSigningCosmWasmClient();
+      const senderAddr = chainContext.address;
 
-      // Passar o array de mensagens diretamente para executeMultiple
-      // Esta é a mudança: não envolver em [] porque já é um array
-      const executionResult = await client.executeMultiple(
-        chainContext.address,
-        tx.transaction, // Array de mensagens diretamente
-        'auto',
-      );
+      // Taxa administrativa anexada pelo useTokenTransfer? Então precisamos misturar
+      // um MsgSend (bank) com os MsgExecuteContract do warp — e executeMultiple NÃO
+      // aceita bank sends. Trocamos para signAndBroadcast com mensagens ENCODADAS,
+      // tudo numa única assinatura (uma aprovação).
+      const feeQuote = (tx as any).adminFee as AdminFeeQuote | undefined;
+
+      let executionResult;
+      if (feeQuote) {
+        const encoded: any[] = (tx.transaction as any[]).map((m) => ({
+          typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
+          value: {
+            sender: senderAddr,
+            contract: m.contractAddress,
+            msg: new TextEncoder().encode(typeof m.msg === 'string' ? m.msg : JSON.stringify(m.msg)),
+            funds: m.funds || [],
+          },
+        }));
+        encoded.push(buildCosmosFeeMsg(senderAddr, feeQuote));
+        logger.debug(
+          `[useCustomCosmosTransactionFns] +taxa administrativa (${feeQuote.amountHuman}) via signAndBroadcast — ${encoded.length} msgs, 1 assinatura`,
+        );
+        executionResult = await client.signAndBroadcast(senderAddr, encoded, 'auto');
+      } else {
+        // Sem taxa: caminho original (executeMultiple com o array de mensagens).
+        executionResult = await client.executeMultiple(senderAddr, tx.transaction, 'auto');
+      }
 
       const txDetails = await client.getTx(executionResult.transactionHash);
       assert(txDetails, `Cosmos tx failed: ${JSON.stringify(txDetails)}`);
