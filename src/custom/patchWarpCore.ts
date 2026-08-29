@@ -11,7 +11,7 @@ import {
     type MultiProtocolProvider,
 } from '@hyperlane-xyz/sdk';
 import { logger } from '../utils/logger';
-import { CwHypCollateralAdapter } from './adapters/CustomCosmWasmTokenAdapter';
+import { CwHypCollateralAdapter, CwHypNativeAdapter } from './adapters/CustomCosmWasmTokenAdapter';
 
 /**
  * Aplica adapters customizados aos tokens do WarpCore que precisam
@@ -67,6 +67,40 @@ export function patchWarpCore(
       } catch (error) {
         logger.error(
           `❌ Error applying custom adapter to token ${token.symbol} on ${token.chainName}:`,
+          error,
+        );
+      }
+    } else if (token.standard === TokenStandard.CwHypNative) {
+      // Warp de moeda NATIVA (ex. LUNC/uluna): o SDK lança "not implemented"
+      // em quoteTransferRemoteGas — usa o adapter customizado com cotação
+      // dinâmica do IGP on-chain.
+      try {
+        const originalGetHypAdapter = token.getHypAdapter.bind(token);
+        // @ts-ignore - Sobrescrevendo método do Token
+        token.getHypAdapter = function(multiProviderArg: MultiProtocolProvider, destination?: any) {
+          if (this.standard === TokenStandard.CwHypNative) {
+            logger.debug(
+              `Using custom NATIVE adapter for token ${this.symbol} on ${this.chainName}`,
+            );
+            return new CwHypNativeAdapter(
+              this.chainName,
+              multiProviderArg,
+              {
+                warpRouter: this.addressOrDenom,
+              },
+            );
+          }
+          return originalGetHypAdapter(multiProviderArg, destination);
+        };
+
+        patchedCount++;
+
+        logger.info(
+          `✅ Applied custom NATIVE adapter override to token ${token.symbol} on ${token.chainName} (warpRouter: ${token.addressOrDenom})`,
+        );
+      } catch (error) {
+        logger.error(
+          `❌ Error applying custom native adapter to token ${token.symbol} on ${token.chainName}:`,
           error,
         );
       }

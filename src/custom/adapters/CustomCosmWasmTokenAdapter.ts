@@ -11,6 +11,7 @@
 
 import {
   CwHypCollateralAdapter as SDKCwHypCollateralAdapter,
+  CwHypNativeAdapter as SDKCwHypNativeAdapter,
   CwNativeTokenAdapter as SDKCwNativeTokenAdapter,
 } from '@hyperlane-xyz/sdk';
 import type { Address } from '@hyperlane-xyz/utils';
@@ -59,6 +60,19 @@ async function quoteCosmosIgp(
     `[quoteCosmosIgp] ${chainName} → dom ${destination}: gás ${gas} → ${amount} uluna (on-chain, dinâmico)`,
   );
   return { igpQuote: { amount, addressOrDenom: 'uluna' } };
+}
+
+/**
+ * Custom CwHypNativeAdapter (standard CwHypNative — warp de moeda NATIVA, ex.
+ * LUNC/uluna). No SDK, populateTransferRemoteTx já funciona (soma valor + fee
+ * em uluna nos funds), mas quoteTransferRemoteGas delega ao adapter sintético,
+ * que lança "not implemented" — aqui cotamos o IGP on-chain, como no CW20.
+ */
+export class CwHypNativeAdapter extends SDKCwHypNativeAdapter {
+  /** Cotação dinâmica do IGP (o SDK lança "not implemented" p/ CW). */
+  async quoteTransferRemoteGas({ destination }: { destination: number }): Promise<any> {
+    return quoteCosmosIgp(this.chainName, await this.getProvider(), destination);
+  }
 }
 
 /**
