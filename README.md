@@ -1,89 +1,89 @@
 # Terra Classic Bridge UI
 
-> **🌐 No ar / Live at: [https://terraclassic-bridge.xyz](https://terraclassic-bridge.xyz/)**
+> **🌐 Live at: [https://terraclassic-bridge.xyz](https://terraclassic-bridge.xyz/)**
 >
-> Esta é a instância oficial do Hyperlane para Terra Classic, rodando em produção nesse domínio.
+> This is the official Hyperlane instance for Terra Classic, running in production on that domain.
 
-Interface web da bridge interchain do Terra Classic — **https://terraclassic-bridge.xyz** — para transferir **LUNC** e **USTC** entre Terra Classic, Solana, BNB Chain e Ethereum via [Hyperlane Warp Routes](https://docs.hyperlane.xyz/docs/reference/applications/warp-routes).
+Web interface for the Terra Classic interchain bridge — **https://terraclassic-bridge.xyz** — to transfer **LUNC** and **USTC** between Terra Classic, Solana, BNB Chain and Ethereum via [Hyperlane Warp Routes](https://docs.hyperlane.xyz/docs/reference/applications/warp-routes).
 
-[![Terra Classic Bridge rodando em terraclassic-bridge.xyz](./docs/live-site.png)](https://terraclassic-bridge.xyz/)
+[![Terra Classic Bridge running at terraclassic-bridge.xyz](./docs/live-site.png)](https://terraclassic-bridge.xyz/)
 
-*A bridge em produção: transferência de LUNC de Solana para Terra Classic em terraclassic-bridge.xyz.*
+*The bridge in production: transferring LUNC from Solana to Terra Classic at terraclassic-bridge.xyz.*
 
-Fork do template oficial [hyperlane-xyz/hyperlane-warp-ui-template](https://github.com/hyperlane-xyz/hyperlane-warp-ui-template). As rotas LUNC/USTC estão publicadas no [registry oficial do Hyperlane](https://github.com/hyperlane-xyz/hyperlane-registry/tree/main/deployments/warp_routes/LUNC) (PRs [#1559](https://github.com/hyperlane-xyz/hyperlane-registry/pull/1559) e [#1687](https://github.com/hyperlane-xyz/hyperlane-registry/pull/1687)).
+Fork of the official [hyperlane-xyz/hyperlane-warp-ui-template](https://github.com/hyperlane-xyz/hyperlane-warp-ui-template). The LUNC/USTC routes are published in the [official Hyperlane registry](https://github.com/hyperlane-xyz/hyperlane-registry/tree/main/deployments/warp_routes/LUNC) (PRs [#1559](https://github.com/hyperlane-xyz/hyperlane-registry/pull/1559) and [#1687](https://github.com/hyperlane-xyz/hyperlane-registry/pull/1687)).
 
-### ✅ Aprovado pela governança do Terra Classic
+### ✅ Approved by Terra Classic governance
 
-A integração Hyperlane e este deployment foram **aprovados on-chain** pela governança da rede (status `PROPOSAL_STATUS_PASSED`):
+The Hyperlane integration and this deployment were **approved on-chain** by the network's governance (status `PROPOSAL_STATUS_PASSED`):
 
-- **[Proposta #12200](https://validator.info/terra-classic/governance/12200)** — *Hyperlane Integration on Terra Classic — Multichain Connectivity with Ethereum, BSC, and Solana*
-- **[Proposta #12222](https://validator.info/terra-classic/governance/12222)** — *Hyperlane Warp Routes - Solana Mainnet Deployment Funding (LUNC/USTC/CW20)*
+- **[Proposal #12200](https://validator.info/terra-classic/governance/12200)** — *Hyperlane Integration on Terra Classic — Multichain Connectivity with Ethereum, BSC, and Solana*
+- **[Proposal #12222](https://validator.info/terra-classic/governance/12222)** — *Hyperlane Warp Routes - Solana Mainnet Deployment Funding (LUNC/USTC/CW20)*
 
 Stack: Next.js 15 + React 18, Hyperlane SDK, RainbowKit (EVM), wallet-adapter (Solana), cosmos-kit (Cosmos).
 
-> Documentação histórica (guias antigos de deploy, troubleshooting e changelogs) está arquivada em [`docs/archive/`](./docs/archive/).
+> Historical documentation (old deployment guides, troubleshooting notes and changelogs) is archived in [`docs/archive/`](./docs/archive/).
 
 ---
 
-## 1. Configuração
+## 1. Configuration
 
-Todas as configurações vêm de variáveis de ambiente. **Atenção:** variáveis `NEXT_PUBLIC_*` são embutidas **no build** do Next.js — mudar depois do build não tem efeito; é preciso rebuildar.
+All configuration comes from environment variables. **Important:** `NEXT_PUBLIC_*` variables are baked into the Next.js **build** — changing them after the build has no effect; a rebuild is required.
 
-### Obrigatória
+### Required
 
-| Variável | Descrição |
+| Variable | Description |
 | --- | --- |
-| `NEXT_PUBLIC_WALLET_CONNECT_ID` | Project ID do [WalletConnect Cloud](https://cloud.walletconnect.com) (necessário para conexão de carteiras) |
+| `NEXT_PUBLIC_WALLET_CONNECT_ID` | Project ID from [WalletConnect Cloud](https://cloud.walletconnect.com) (required for wallet connections) |
 
-### Taxa de administração (opcional)
+### Administration fee (optional)
 
-Taxa fixa em USD cobrada por transferência, convertida em tempo real para o token nativo da chain de origem e incluída **na mesma transação** do envio (uma única aprovação). Carteira vazia = taxa desligada naquela chain.
+A flat USD fee charged per transfer, converted in real time to the origin chain's native token and included **in the same transaction** as the transfer (a single approval). An empty wallet = fee disabled on that chain.
 
-| Variável | Descrição |
+| Variable | Description |
 | --- | --- |
-| `NEXT_PUBLIC_ADMIN_FEE_USD` | Valor da taxa em USD (ex.: `0.5`). `0` desliga em todas as chains |
-| `NEXT_PUBLIC_ADMIN_FEE_WALLET_TERRACLASSIC` | Carteira `terra1...` que recebe a taxa no Terra Classic |
-| `NEXT_PUBLIC_ADMIN_FEE_WALLET_BSC` | Carteira `0x...` na BNB Chain |
-| `NEXT_PUBLIC_ADMIN_FEE_WALLET_ETHEREUM` | Carteira `0x...` na Ethereum |
-| `NEXT_PUBLIC_ADMIN_FEE_WALLET_SOLANA` | Carteira Solana (base58) |
+| `NEXT_PUBLIC_ADMIN_FEE_USD` | Fee amount in USD (e.g. `0.5`). `0` disables it on all chains |
+| `NEXT_PUBLIC_ADMIN_FEE_WALLET_TERRACLASSIC` | `terra1...` wallet that receives the fee on Terra Classic |
+| `NEXT_PUBLIC_ADMIN_FEE_WALLET_BSC` | `0x...` wallet on BNB Chain |
+| `NEXT_PUBLIC_ADMIN_FEE_WALLET_ETHEREUM` | `0x...` wallet on Ethereum |
+| `NEXT_PUBLIC_ADMIN_FEE_WALLET_SOLANA` | Solana wallet (base58) |
 
-### Demais opcionais
+### Other optional variables
 
-| Variável | Descrição |
+| Variable | Description |
 | --- | --- |
-| `NEXT_PUBLIC_TX_MEMO` | Memo gravado nas transações Cosmos (default `terraclassic-bridge`) |
-| `NEXT_PUBLIC_REGISTRY_URL` / `NEXT_PUBLIC_REGISTRY_BRANCH` | Registry Hyperlane customizado (default: registry oficial) |
-| `NEXT_PUBLIC_RPC_OVERRIDES` | JSON com RPCs próprios por chain: `{"chain":{"http":"https://..."}}` |
-| `NEXT_PUBLIC_ALLOWED_CHAIN_DOMAIN_IDS` | Restringe as chains exibidas (lista de domain IDs) |
-| `NEXT_PUBLIC_GITHUB_PROXY` | Proxy para os fetches do registry no GitHub |
-| `NEXT_PUBLIC_TRANSFER_BLACKLIST` / `NEXT_PUBLIC_CHAIN_WALLET_WHITELISTS` | Filtros de rotas/carteiras |
-| `NEXT_PUBLIC_SENTRY_DSN`, `NEXT_PUBLIC_VERSION`, `NEXT_PUBLIC_REFINER_*` | Telemetria (opcionais) |
+| `NEXT_PUBLIC_TX_MEMO` | Memo written on Cosmos transactions (default `terraclassic-bridge`) |
+| `NEXT_PUBLIC_REGISTRY_URL` / `NEXT_PUBLIC_REGISTRY_BRANCH` | Custom Hyperlane registry (default: official registry) |
+| `NEXT_PUBLIC_RPC_OVERRIDES` | JSON with custom RPCs per chain: `{"chain":{"http":"https://..."}}` |
+| `NEXT_PUBLIC_ALLOWED_CHAIN_DOMAIN_IDS` | Restricts which chains are shown (list of domain IDs) |
+| `NEXT_PUBLIC_GITHUB_PROXY` | Proxy for the registry fetches on GitHub |
+| `NEXT_PUBLIC_TRANSFER_BLACKLIST` / `NEXT_PUBLIC_CHAIN_WALLET_WHITELISTS` | Route/wallet filters |
+| `NEXT_PUBLIC_SENTRY_DSN`, `NEXT_PUBLIC_VERSION`, `NEXT_PUBLIC_REFINER_*` | Telemetry (optional) |
 
-Modelo completo em [`.env.example`](./.env.example).
+Full template in [`.env.example`](./.env.example).
 
-Rotas e branding: `src/consts/warpRoutes.yaml` (tokens), `src/consts/chains.yaml` (chains), `src/consts/app.ts` (nome/cores/logos).
+Routes and branding: `src/consts/warpRoutes.yaml` (tokens), `src/consts/chains.yaml` (chains), `src/consts/app.ts` (name/colors/logos).
 
-## 2. Executar localmente (desenvolvimento)
+## 2. Running locally (development)
 
-Requisitos: Node 20+ e `pnpm@10`.
+Requirements: Node 20+ and `pnpm@10`.
 
 ```sh
 pnpm install
-cp .env.example .env   # preencha ao menos NEXT_PUBLIC_WALLET_CONNECT_ID
+cp .env.example .env   # fill in at least NEXT_PUBLIC_WALLET_CONNECT_ID
 pnpm dev               # http://localhost:3000
 ```
 
-Checagens: `pnpm lint`, `pnpm typecheck`, `pnpm test`.
+Checks: `pnpm lint`, `pnpm typecheck`, `pnpm test`.
 
-## 3. Executar no servidor (produção)
+## 3. Running on a server (production)
 
-### Opção A — Docker (recomendado)
+### Option A — Docker (recommended)
 
-O `Dockerfile` recebe as variáveis como **build args** (por serem `NEXT_PUBLIC_*`):
+The `Dockerfile` takes the variables as **build args** (because they are `NEXT_PUBLIC_*`):
 
 ```sh
 docker build \
-  --build-arg NEXT_PUBLIC_WALLET_CONNECT_ID=SEU_PROJECT_ID \
+  --build-arg NEXT_PUBLIC_WALLET_CONNECT_ID=YOUR_PROJECT_ID \
   --build-arg NEXT_PUBLIC_ADMIN_FEE_USD=0.5 \
   --build-arg NEXT_PUBLIC_ADMIN_FEE_WALLET_TERRACLASSIC=terra1... \
   --build-arg NEXT_PUBLIC_ADMIN_FEE_WALLET_SOLANA=... \
@@ -92,24 +92,24 @@ docker build \
 docker run -d -p 3000:3000 --restart unless-stopped terraclassic-bridge-ui
 ```
 
-A app sobe na porta `3000` (`PORT`/`HOSTNAME` ajustáveis via ambiente no runtime). Há também um `docker-compose.yml` de exemplo.
+The app listens on port `3000` (`PORT`/`HOSTNAME` adjustable via environment at runtime). A sample `docker-compose.yml` is also included.
 
-### Opção B — EasyPanel (deploy atual)
+### Option B — EasyPanel (current deployment)
 
-1. Crie um app do tipo **App/Web** apontando para este repositório (branch `main`), build via Dockerfile.
-2. Defina as variáveis `NEXT_PUBLIC_*` nas **variáveis de build/ambiente do EasyPanel _antes_ do primeiro build** (elas entram no build, não só no runtime).
-3. Exponha a porta do container (`3000`) no proxy/domínio do EasyPanel.
-4. Health check: `HTTP`, path `/api/health`, porta do app, start period `120s`, interval `30s`, timeout `15s`, retries `5`.
-5. Para atualizar: push no `main` → rebuild no EasyPanel (ou configure build automático por webhook).
+1. Create an **App/Web** app pointing to this repository (branch `main`), built via the Dockerfile.
+2. Set the `NEXT_PUBLIC_*` variables in EasyPanel's **build/environment variables _before_ the first build** (they are consumed at build time, not just at runtime).
+3. Expose the container port (`3000`) through EasyPanel's proxy/domain.
+4. Health check: `HTTP`, path `/api/health`, app port, start period `120s`, interval `30s`, timeout `15s`, retries `5`.
+5. To update: push to `main` → rebuild in EasyPanel (or set up automatic builds via webhook).
 
-### Opção C — Node puro
+### Option C — Plain Node
 
 ```sh
 pnpm install
-NEXT_PUBLIC_WALLET_CONNECT_ID=... pnpm build   # variáveis no momento do build!
-pnpm start                                      # porta 3000
+NEXT_PUBLIC_WALLET_CONNECT_ID=... pnpm build   # variables at build time!
+pnpm start                                      # port 3000
 ```
 
-## 4. Licença
+## 4. License
 
-[Apache 2.0](./LICENSE.md) — herdada do template da Hyperlane.
+[Apache 2.0](./LICENSE.md) — inherited from the Hyperlane template.
