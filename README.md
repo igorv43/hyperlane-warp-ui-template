@@ -1,6 +1,14 @@
 # Terra Classic Bridge UI
 
+> **🌐 No ar / Live at: [https://terraclassic-bridge.xyz](https://terraclassic-bridge.xyz/)**
+>
+> Esta é a instância oficial do Hyperlane para Terra Classic, rodando em produção nesse domínio.
+
 Interface web da bridge interchain do Terra Classic — **https://terraclassic-bridge.xyz** — para transferir **LUNC** e **USTC** entre Terra Classic, Solana, BNB Chain e Ethereum via [Hyperlane Warp Routes](https://docs.hyperlane.xyz/docs/reference/applications/warp-routes).
+
+[![Terra Classic Bridge rodando em terraclassic-bridge.xyz](./docs/live-site.png)](https://terraclassic-bridge.xyz/)
+
+*A bridge em produção: transferência de LUNC de Solana para Terra Classic em terraclassic-bridge.xyz.*
 
 Fork do template oficial [hyperlane-xyz/hyperlane-warp-ui-template](https://github.com/hyperlane-xyz/hyperlane-warp-ui-template). As rotas LUNC/USTC estão publicadas no [registry oficial do Hyperlane](https://github.com/hyperlane-xyz/hyperlane-registry/tree/main/deployments/warp_routes/LUNC) (PRs [#1559](https://github.com/hyperlane-xyz/hyperlane-registry/pull/1559) e [#1687](https://github.com/hyperlane-xyz/hyperlane-registry/pull/1687)).
 
