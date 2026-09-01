@@ -12,6 +12,13 @@ Interface web da bridge interchain do Terra Classic — **https://terraclassic-b
 
 Fork do template oficial [hyperlane-xyz/hyperlane-warp-ui-template](https://github.com/hyperlane-xyz/hyperlane-warp-ui-template). As rotas LUNC/USTC estão publicadas no [registry oficial do Hyperlane](https://github.com/hyperlane-xyz/hyperlane-registry/tree/main/deployments/warp_routes/LUNC) (PRs [#1559](https://github.com/hyperlane-xyz/hyperlane-registry/pull/1559) e [#1687](https://github.com/hyperlane-xyz/hyperlane-registry/pull/1687)).
 
+### ✅ Aprovado pela governança do Terra Classic
+
+A integração Hyperlane e este deployment foram **aprovados on-chain** pela governança da rede (status `PROPOSAL_STATUS_PASSED`):
+
+- **[Proposta #12200](https://validator.info/terra-classic/governance/12200)** — *Hyperlane Integration on Terra Classic — Multichain Connectivity with Ethereum, BSC, and Solana*
+- **[Proposta #12222](https://validator.info/terra-classic/governance/12222)** — *Hyperlane Warp Routes - Solana Mainnet Deployment Funding (LUNC/USTC/CW20)*
+
 Stack: Next.js 15 + React 18, Hyperlane SDK, RainbowKit (EVM), wallet-adapter (Solana), cosmos-kit (Cosmos).
 
 > Documentação histórica (guias antigos de deploy, troubleshooting e changelogs) está arquivada em [`docs/archive/`](./docs/archive/).
