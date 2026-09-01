@@ -10,7 +10,7 @@ Web interface for the Terra Classic interchain bridge — **https://bridge.terra
 
 [![Terra Classic Bridge running at bridge.terra-classic.io](./docs/live-site.png)](https://bridge.terra-classic.io/)
 
-*The bridge in production: transferring LUNC from Solana to Terra Classic.*
+*The bridge live at bridge.terra-classic.io: transferring LUNC from Terra Classic to BSC.*
 
 Fork of the official [hyperlane-xyz/hyperlane-warp-ui-template](https://github.com/hyperlane-xyz/hyperlane-warp-ui-template). The LUNC/USTC routes are published in the [official Hyperlane registry](https://github.com/hyperlane-xyz/hyperlane-registry/tree/main/deployments/warp_routes/LUNC) (PRs [#1559](https://github.com/hyperlane-xyz/hyperlane-registry/pull/1559) and [#1687](https://github.com/hyperlane-xyz/hyperlane-registry/pull/1687)).
 
