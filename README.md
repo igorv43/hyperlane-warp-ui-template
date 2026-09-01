@@ -3,8 +3,6 @@
 > **🌐 Live at: [https://bridge.terra-classic.io](https://bridge.terra-classic.io/)**
 >
 > This is the official Hyperlane instance for Terra Classic, served from a subdomain of the official Terra Classic website, [terra-classic.io](https://terra-classic.io) — the site listed as the project's official website on [CoinMarketCap](https://coinmarketcap.com/currencies/terra-luna/) and [CoinGecko](https://www.coingecko.com/en/coins/terra-luna-classic). The previous domain [terraclassic-bridge.xyz](https://terraclassic-bridge.xyz/) remains available.
->
-> ⚠️ **The warp contracts are still undergoing changes** — contract addresses referenced in this documentation may change.
 
 Web interface for the Terra Classic interchain bridge — **https://bridge.terra-classic.io** — to transfer **LUNC** and **USTC** between Terra Classic, Solana, BNB Chain and Ethereum via [Hyperlane Warp Routes](https://docs.hyperlane.xyz/docs/reference/applications/warp-routes).
 
