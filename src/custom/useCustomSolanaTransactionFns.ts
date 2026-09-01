@@ -40,7 +40,14 @@ export function useCustomSolanaTransactionFns(multiProvider: MultiProtocolProvid
       if (activeChainName && activeChainName !== chainName) await switchNetwork(chainName);
 
       const rpcUrl = multiProvider.getRpcUrl(chainName);
-      const connection = new Connection(rpcUrl, 'confirmed');
+      // Explicit wsEndpoint: when the http RPC is our server-side proxy
+      // (/api/rpc/solana), the ws endpoint web3.js would derive from it does
+      // not exist — subscriptions (confirmTransaction) use a public ws.
+      const connection = new Connection(rpcUrl, {
+        commitment: 'confirmed',
+        wsEndpoint:
+          process.env.NEXT_PUBLIC_SOLANA_WS_URL || 'wss://api.mainnet-beta.solana.com/',
+      });
       const legacyTx = tx.transaction as Transaction;
       const additionalSigners = getAdditionalSigners(legacyTx);
 
