@@ -1,8 +1,8 @@
 /**
- * Hook para usar tokens com adapters customizados
- * 
- * Este hook pode ser usado para criar tokens com os adapters corrigidos
- * quando necessário, especialmente para tokens CwHypCollateral com colateral CW20
+ * Hook to use tokens with custom adapters
+ *
+ * This hook can be used to create tokens with the fixed adapters
+ * when needed, especially for CwHypCollateral tokens with CW20 collateral
  */
 
 import { useMemo } from 'react';
@@ -15,7 +15,7 @@ import {
 import { CwHypCollateralAdapter } from './adapters/CustomCosmWasmTokenAdapter';
 
 /**
- * Cria um token com adapter customizado se necessário
+ * Creates a token with a custom adapter if needed
  */
 export function useCustomToken(
   token: IToken | undefined,
@@ -24,14 +24,14 @@ export function useCustomToken(
   return useMemo(() => {
     if (!token || !multiProvider) return undefined;
 
-    // Se for CwHypCollateral, verifica se precisa do adapter customizado
+    // If it is CwHypCollateral, check whether it needs the custom adapter
     if (token.standard === TokenStandard.CwHypCollateral && token.collateralAddressOrDenom) {
       try {
-        // Cria o token normalmente
+        // Create the token normally
         const customToken = new Token(token);
 
-        // Substitui o adapter pelo customizado
-        // @ts-ignore - Acessando propriedade privada para substituir o adapter
+        // Replace the adapter with the custom one
+        // @ts-ignore - Accessing private property to replace the adapter
         const customAdapter = new CwHypCollateralAdapter(
           token.chainName,
           multiProvider,
@@ -41,7 +41,7 @@ export function useCustomToken(
           },
         );
 
-        // @ts-ignore - Substituindo o adapter interno
+        // @ts-ignore - Replacing the internal adapter
         customToken.adapter = customAdapter;
 
         return customToken;
@@ -51,7 +51,7 @@ export function useCustomToken(
       }
     }
 
-    // Para outros padrões, retorna o token normal
+    // For other standards, return the normal token
     return new Token(token);
   }, [token, multiProvider]);
 }

@@ -1,11 +1,11 @@
 /**
- * Memo escrito nas transações Cosmos (Terra Classic) enviadas pela UI.
+ * Memo written into the Cosmos (Terra Classic) transactions sent by the UI.
  *
- * Terra/Cosmos têm um campo `memo` nativo na transação — é onde marcamos a origem
- * (ex.: "terraclassic-bridge"). Configurável por operador via NEXT_PUBLIC_TX_MEMO;
- * default "terraclassic-bridge". String vazia = sem memo.
+ * Terra/Cosmos have a native `memo` field in the transaction — that's where we mark the
+ * origin (e.g. "terraclassic-bridge"). Configurable per operator via NEXT_PUBLIC_TX_MEMO;
+ * default "terraclassic-bridge". Empty string = no memo.
  *
- * Observação: EVM (BSC/Ethereum) NÃO tem campo de memo; Solana só via instrução do
- * Memo Program. Aqui aplicamos apenas no Cosmos, que é o caso nativo.
+ * Note: EVM (BSC/Ethereum) has NO memo field; Solana only via a Memo Program
+ * instruction. Here we apply it only on Cosmos, which is the native case.
  */
 export const TX_MEMO = (process.env.NEXT_PUBLIC_TX_MEMO ?? 'terraclassic-bridge').trim();

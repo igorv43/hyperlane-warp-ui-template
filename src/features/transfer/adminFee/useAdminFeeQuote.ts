@@ -1,6 +1,6 @@
 /**
- * Hook que cota a taxa administrativa da chain de ORIGEM em tempo real, para exibir
- * ao usuário antes do envio. Atualiza a cada 20s (preço vivo da Binance).
+ * Hook that quotes the ORIGIN chain's administrative fee in real time, to display
+ * to the user before sending. Refreshes every 20s (live Binance price).
  */
 import { useQuery } from '@tanstack/react-query';
 import { getAdminFeeChain } from '../../../consts/adminFee';

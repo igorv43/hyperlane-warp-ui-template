@@ -46,7 +46,7 @@ export function useTokenTransfer(onDone?: () => void) {
 
   const activeAccounts = useAccounts(multiProvider);
   const activeChains = useActiveChains(multiProvider);
-  // Fns customizadas: Cosmos (multi-message + taxa) e EVM (EIP-5792 + taxa)
+  // Custom fns: Cosmos (multi-message + fee) and EVM (EIP-5792 + fee)
   const transactionFns = useCustomTransactionFns(multiProvider);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -108,7 +108,6 @@ async function executeTransfer({
   setIsLoading: (b: boolean) => void;
   onDone?: () => void;
 }) {
-  console.log('igor - Executing transfer...');
   logger.debug('Preparing transfer transaction(s)');
   setIsLoading(true);
   let transferStatus: TransferStatus = TransferStatus.Preparing;
@@ -133,16 +132,16 @@ async function executeTransfer({
     const sender = getAccountAddressForChain(multiProvider, origin, activeAccounts.accounts);
     if (!sender) throw new Error('No active account found for origin chain');
 
-    // Taxa administrativa (mantém a UI no ar): cotada AGORA com preço vivo do nativo
-    // da origem. null = taxa desligada nesta chain (sem carteira) ou preço indisponível
-    // (aí a transferência segue sem taxa — nunca travamos o usuário por um soluço de preço).
+    // Administrative fee (keeps the UI running): quoted NOW with the live price of the
+    // origin's native token. null = fee disabled on this chain (no wallet) or price unavailable
+    // (in that case the transfer proceeds without the fee — we never block the user over a price hiccup).
     let feeQuote: AdminFeeQuote | null = null;
     try {
       feeQuote = await quoteAdminFee(origin);
       if (feeQuote)
         logger.debug(`[adminFee] ${feeQuote.feeUsd} USD = ${feeQuote.amountHuman} (${origin})`);
     } catch (e) {
-      logger.warn('[adminFee] falha ao cotar taxa — seguindo sem taxa', e);
+      logger.warn('[adminFee] failed to quote fee — proceeding without fee', e);
     }
 
     const isCollateralSufficient = await warpCore.isDestinationCollateralSufficient({
@@ -199,11 +198,8 @@ async function executeTransfer({
 
       hashes.push(hash);
     } else {
-      // Para Cosmos, combinar múltiplas transações de aprovação em uma única transação multi-message
-      // Verifica se é Cosmos verificando o protocolo ou o tipo das transações
-     
-      console.log('igor - isCosmosProtocol',txs,originProtocol);
-     
+      // For Cosmos, combine multiple approval transactions into a single multi-message transaction
+      // Check whether it is Cosmos by checking the protocol or the transaction types
       const isCosmosProtocol =
         originProtocol === ProtocolType.Cosmos ||
         originProtocol === ProtocolType.CosmosNative ||
@@ -213,26 +209,25 @@ async function executeTransfer({
             txs[0].type === ProviderType.CosmJs));
 
       if (isCosmosProtocol) {
-        // Filtrar Approval e Transfer de uma única vez para combiná-las em uma transação multi-message
+        // Filter Approval and Transfer at once to combine them into a multi-message transaction
         const approvalAndTransferTxs = txs.filter(
           (tx) =>
             tx.category === WarpTxCategory.Approval ||
             tx.category === WarpTxCategory.Transfer,
         );
 
-        console.log('igor - approvalAndTransferTxs', approvalAndTransferTxs);
-        // Se houver Approval e/ou Transfer, combiná-las em uma única transação multi-message
+        // If there are Approval and/or Transfer txs, combine them into a single multi-message transaction
         if (approvalAndTransferTxs.length > 0) {
           logger.info(
             `Combining ${approvalAndTransferTxs.length} approval and transfer transactions into a single multi-message transaction for Cosmos`,
           );
 
-          // Criar uma transação multi-message combinando todas as mensagens
-          // Para CosmWasm, precisamos criar um array de mensagens
+          // Create a multi-message transaction combining all the messages
+          // For CosmWasm, we need to create an array of messages
           const combinedMsgs: any[] = [];
           let combinedFunds: any[] = [];
 
-          // Adicionar mensagens de approval primeiro
+          // Add the approval messages first
           approvalAndTransferTxs
             .filter((tx) => tx.category === WarpTxCategory.Approval)
             .forEach((tx) => {
@@ -245,7 +240,7 @@ async function executeTransfer({
               }
             });
 
-          // Adicionar mensagens de transfer depois
+          // Add the transfer messages after
           approvalAndTransferTxs
             .filter((tx) => tx.category === WarpTxCategory.Transfer)
             .forEach((tx) => {
@@ -255,14 +250,14 @@ async function executeTransfer({
                   msg: tx.transaction.msg,
                   funds: tx.transaction.funds || [],
                 });
-                // Combinar funds da transferência (contém as taxas)
+                // Combine the transfer's funds (contains the fees)
                 if (tx.transaction.funds && tx.transaction.funds.length > 0) {
                   combinedFunds = [...combinedFunds, ...tx.transaction.funds];
                 }
               }
             });
 
-          // Remover duplicatas de funds (mesmo denom)
+          // Remove duplicate funds (same denom)
           const uniqueFunds = combinedFunds.reduce((acc: any[], fund: any) => {
             const existing = acc.find((f) => f.denom === fund.denom);
             if (existing) {
@@ -275,17 +270,17 @@ async function executeTransfer({
             return acc;
           }, []);
 
-          // Criar transação combinada usando a primeira transação como base
-          // Passar o array de mensagens diretamente como transaction
-          // A função customizada useCustomCosmosTransactionFns detecta arrays e chama executeMultiple diretamente
+          // Create the combined transaction using the first transaction as a base
+          // Pass the array of messages directly as the transaction
+          // The custom useCustomCosmosTransactionFns function detects arrays and calls executeMultiple directly
           const baseTx = approvalAndTransferTxs[0];
           const combinedTx = {
             ...baseTx,
             category: WarpTxCategory.Transfer,
-            // Passar o array de mensagens diretamente
-            // Estrutura: [{contractAddress, msg, funds}, {contractAddress, msg, funds}]
+            // Pass the array of messages directly
+            // Structure: [{contractAddress, msg, funds}, {contractAddress, msg, funds}]
             transaction: combinedMsgs as any,
-            // Taxa administrativa: o custom cosmos fn soma um MsgSend na MESMA tx (1 assinatura)
+            // Administrative fee: the custom cosmos fn adds a MsgSend in the SAME tx (1 signature)
             adminFee: feeQuote || undefined,
           } as any;
 
@@ -314,8 +309,7 @@ async function executeTransfer({
 
           hashes.push(hash);
         } else {
-          console.log('igor - else',txs);
-          // Se houver apenas uma aprovação ou nenhuma, enviar normalmente
+          // If there is only one approval or none, send normally
           for (const tx of txs) {
             updateTransferStatus(
               transferIndex,
@@ -339,26 +333,26 @@ async function executeTransfer({
           }
         }
       } else {
-        // Para outros protocolos (EVM e Solana), enviar normalmente
+        // For other protocols (EVM and Solana), send normally
         for (const tx of txs) {
-          // Taxa administrativa: anexar/injetar SÓ na transação de TRANSFERÊNCIA
-          // (nunca na aprovação ERC20). Aprovação segue sem taxa.
+          // Administrative fee: attach/inject ONLY into the TRANSFER transaction
+          // (never into the ERC20 approval). The approval proceeds without the fee.
           if (feeQuote && tx.category === WarpTxCategory.Transfer) {
             if (originProtocol === ProtocolType.Ethereum) {
-              // EVM: o custom fn (sendWithFee) lê isto e faz o batch EIP-5792 (1 aprovação)
+              // EVM: the custom fn (sendWithFee) reads this and does the EIP-5792 batch (1 approval)
               (tx as any).adminFee = feeQuote;
             } else if (originProtocol === ProtocolType.Sealevel) {
-              // Solana: injeta a instrução da taxa no MESMO Transaction (1 assinatura)
+              // Solana: injects the fee instruction into the SAME Transaction (1 signature)
               try {
                 const solTx: any = tx.transaction;
                 if (solTx && typeof solTx.add === 'function') {
                   solTx.add(buildSolanaFeeInstruction(new PublicKey(sender), feeQuote));
-                  logger.debug(`[adminFee][solana] taxa ${feeQuote.amountHuman} injetada na tx`);
+                  logger.debug(`[adminFee][solana] fee ${feeQuote.amountHuman} injected into the tx`);
                 } else {
-                  logger.warn('[adminFee][solana] Transaction não-legacy — taxa pulada nesta tx');
+                  logger.warn('[adminFee][solana] non-legacy Transaction — fee skipped for this tx');
                 }
               } catch (e) {
-                logger.warn('[adminFee][solana] falha ao injetar taxa — seguindo sem taxa', e);
+                logger.warn('[adminFee][solana] failed to inject fee — proceeding without fee', e);
               }
             }
           }

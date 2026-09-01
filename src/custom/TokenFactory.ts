@@ -1,9 +1,9 @@
 /**
- * Factory customizado para criar tokens com adapters corrigidos
- * 
- * Este factory sobrescreve a criação de tokens CwHypCollateral
- * para usar o CustomCwHypCollateralAdapter que corrige o bug
- * de suporte a CW20 como colateral
+ * Custom factory to create tokens with fixed adapters
+ *
+ * This factory overrides the creation of CwHypCollateral tokens
+ * to use the CustomCwHypCollateralAdapter, which fixes the bug
+ * in CW20-as-collateral support
  */
 
 import {
@@ -17,11 +17,11 @@ import type { Address } from '@hyperlane-xyz/utils';
 import { CwHypCollateralAdapter } from './adapters/CustomCosmWasmTokenAdapter';
 
 /**
- * Factory customizado que cria tokens com adapters corrigidos
+ * Custom factory that creates tokens with fixed adapters
  */
 export class CustomTokenFactory {
   /**
-   * Cria um token com o adapter customizado quando necessário
+   * Creates a token with the custom adapter when needed
    */
   static createToken(
     chainName: ChainName,
@@ -37,13 +37,13 @@ export class CustomTokenFactory {
       connections?: TokenConnection[];
     },
   ): Token {
-    // Se for CwHypCollateral, usa o adapter customizado
+    // If it is CwHypCollateral, use the custom adapter
     if (standard === TokenStandard.CwHypCollateral) {
       if (!options.collateralAddressOrDenom) {
         throw new Error('collateralAddressOrDenom required for CwHypCollateral');
       }
 
-      // Cria o token normalmente
+      // Create the token normally
       const token = new Token({
         chainName,
         standard,
@@ -56,20 +56,20 @@ export class CustomTokenFactory {
         connections: options.connections,
       });
 
-      // Substitui o adapter pelo customizado
-      // @ts-ignore - Acessando propriedade privada para substituir o adapter
+      // Replace the adapter with the custom one
+      // @ts-ignore - Accessing private property to replace the adapter
       const customAdapter = new CwHypCollateralAdapter(chainName, multiProvider, {
         warpRouter: addressOrDenom,
         token: options.collateralAddressOrDenom,
       });
       
-      // @ts-ignore - Substituindo o adapter interno
+      // @ts-ignore - Replacing the internal adapter
       token.adapter = customAdapter;
 
       return token;
     }
 
-    // Para outros padrões, usa a criação normal
+    // For other standards, use normal creation
     return new Token({
       chainName,
       standard,

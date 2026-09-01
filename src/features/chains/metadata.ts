@@ -100,9 +100,9 @@ export async function assembleChainMetadata(
 
     if (!overridesUrl) return metadata;
 
-    // O RPC informado pelo operador (override) deve ser o PRIMÁRIO em qualquer
-    // protocolo — senão um RPC público do registry (ex.: bsc.drpc.org) é tentado
-    // primeiro e dá 429. Os do registry ficam como fallback depois dele.
+    // The RPC provided by the operator (override) must be the PRIMARY one on any
+    // protocol — otherwise a public registry RPC (e.g. bsc.drpc.org) is tried
+    // first and returns 429. The registry ones remain as fallbacks after it.
     const rpcUrls = [overridesUrl, ...metadata.rpcUrls];
 
     return { ...metadata, rpcUrls };

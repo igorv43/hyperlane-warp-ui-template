@@ -18,7 +18,7 @@ export function useIsApproveRequired(token?: IToken, amount?: string, enabled = 
     queryFn: async () => {
       if (!token || !owner || !amount) return false;
       const isRequired = await warpCore.isApproveRequired({ originTokenAmount: token.amount(amount), owner });
-      // Log para debug - verificar se está detectando corretamente para tokens CW20
+      // Debug log - check whether detection is working correctly for CW20 tokens
       console.log('[useIsApproveRequired]', {
         tokenSymbol: token.symbol,
         tokenStandard: token.standard,
@@ -28,7 +28,7 @@ export function useIsApproveRequired(token?: IToken, amount?: string, enabled = 
         owner,
         isRequired,
       });
-      // Log explícito do resultado
+      // Explicit log of the result
       console.log(`[useIsApproveRequired] RESULT: isRequired = ${isRequired} for token ${token.symbol}`);
       return isRequired;
     },

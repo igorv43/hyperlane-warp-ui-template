@@ -1,9 +1,9 @@
 /**
- * Exporta todas as classes customizadas de adapters
- * Usando os mesmos nomes do SDK para facilitar substituição
- * 
- * Nota: CwTokenAdapter não precisa ser customizado pois sempre será usado
- * como colateral via CwHypCollateralAdapter que já tem a correção
+ * Exports all custom adapter classes
+ * Using the same names as the SDK to make substitution easier
+ *
+ * Note: CwTokenAdapter does not need to be customized because it will always be used
+ * as collateral via CwHypCollateralAdapter, which already has the fix
  */
 export {
   CwNativeTokenAdapter,

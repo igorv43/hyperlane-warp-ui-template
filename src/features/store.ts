@@ -245,7 +245,7 @@ async function initWarpContext({
     const multiProvider = new MultiProtocolProvider(chainMetadataWithOverrides);
     const warpCore = WarpCore.FromConfig(multiProvider, coreConfig);
 
-    // Aplicar adapters customizados para corrigir bugs do SDK (CW20 como colateral)
+    // Apply custom adapters to fix SDK bugs (CW20 as collateral)
     const { patchWarpCore } = await import('../custom/patchWarpCore');
     patchWarpCore(warpCore, multiProvider);
 

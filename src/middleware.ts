@@ -46,8 +46,8 @@ const BLOCKED_REGIONS = [
 
 export function middleware(req: NextRequest) {
   try {
-    // geolocation só funciona na Vercel, em outros ambientes retorna undefined
-    // Fazemos try-catch para não quebrar em outros ambientes como EasyPanel
+    // geolocation only works on Vercel; in other environments it returns undefined
+    // We use try-catch so it doesn't break in other environments like EasyPanel
     const geo = geolocation(req);
     const country = geo?.country;
     const region = geo?.region;
@@ -64,8 +64,8 @@ export function middleware(req: NextRequest) {
       return NextResponse.redirect(new URL('/blocked', req.url));
     }
   } catch (error) {
-    // Se geolocation falhar (ex: em ambientes não-Vercel), apenas continua
-    // Isso permite que a aplicação funcione em EasyPanel e outros hosts
+    // If geolocation fails (e.g. in non-Vercel environments), just continue
+    // This allows the application to work on EasyPanel and other hosts
     console.warn('Geolocation not available:', error);
   }
 

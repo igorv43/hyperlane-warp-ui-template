@@ -25,11 +25,11 @@ export const warpRouteConfigs: WarpCoreConfig = {
 //     logoURI: 'https://raw.githubusercontent.com/classic-terra/assets/60d34b97178cfdcd77fb87d7deeb7d3ab0ede6ee/icon/svg/LUNC.svg',
 //   },
   
-//   // 2. Configuração do token Sintético (o destino em BSC)
+//   // 2. Synthetic token configuration (the destination on BSC)
 //   {
 //     chainName: 'bsctestnet',
 //     standard: TokenStandard.EvmHypSynthetic,
-//     // Endereço do contrato do token sintético na BSC
+//     // Address of the synthetic token contract on BSC
 //     addressOrDenom: '0x2144be4477202ba2d50c9a8be3181241878cf7d8',
 //     name: 'Luna Classic',
 //     symbol: 'wwwwLUNC',
@@ -42,7 +42,7 @@ export const warpRouteConfigs: WarpCoreConfig = {
 //   },{
 //     chainName: 'sepolia',
 //     standard: TokenStandard.EvmHypSynthetic,
-//     // Endereço do contrato do token sintético na BSC
+//     // Address of the synthetic token contract on BSC
 //     addressOrDenom: '0x224a4419D7FA69D3bEbAbce574c7c84B48D829b4',
 //     name: 'Luna Classic',
 //     symbol: 'LUNC',
@@ -56,10 +56,10 @@ export const warpRouteConfigs: WarpCoreConfig = {
 //   {
 //     chainName: 'solanatestnet',
 //     standard: TokenStandard.SealevelHypSynthetic,
-//     // Endereço do mint do token colateral em Solana (Token-2022)
+//     // Mint address of the collateral token on Solana (Token-2022)
 //     // Mint address: 3yhG9dDHVX6K1duf8znEcaJcuTiKSLYvfBD4xy6akxfu
 //     addressOrDenom: 'HNxN3ZSBtD5J2nNF4AATMhuvTWVeHQf18nTtzKtsnkyw',
-//     // Colateral: SOL (wrapped SOL) - endereço base58 válido para Solana
+//     // Collateral: SOL (wrapped SOL) - valid base58 address for Solana
 //     collateralAddressOrDenom: '3yhG9dDHVX6K1duf8znEcaJcuTiKSLYvfBD4xy6akxfu',
 //     name: 'Luna Classic',
 //     symbol: 'wwwwwLUNC',
@@ -77,35 +77,35 @@ export const warpRouteConfigs: WarpCoreConfig = {
 //       {
 //         origin: 'terraclassictestnet',
 //         destination: 'bsctestnet',
-//         amount: 1780832150, // Taxa interchain em microLUNA (uluna)
+//         amount: 1780832150, // Interchain fee in microLUNA (uluna)
 //         addressOrDenom: 'uluna',
 //       },{
 //         origin: 'terraclassictestnet',
 //         destination: 'solanatestnet',
-//         amount: 1780832150, // Taxa interchain em microLUNA (uluna)
+//         amount: 1780832150, // Interchain fee in microLUNA (uluna)
 //         addressOrDenom: 'uluna',
 //       },{
 //         origin: 'terraclassictestnet',
 //         destination: 'sepolia',
-//         amount: 1780832150, // Taxa interchain em microLUNA (uluna)
+//         amount: 1780832150, // Interchain fee in microLUNA (uluna)
 //         addressOrDenom: 'uluna',
 //       }
 //     ],
-//     // Taxas locais constantes para evitar simulação problemática
-//     // O contrato precisa de 283215 uluna para o hook payment
+//     // Constant local fees to avoid problematic simulation
+//     // The contract needs 283215 uluna for the hook payment
 //     localFeeConstants: [
 //       {
 //         origin: 'terraclassictestnet',
 //         destination: 'bsctestnet',
-//         amount: 383215, // Taxa local em microLUNA (uluna) - valor exigido pelo contrato
+//         amount: 383215, // Local fee in microLUNA (uluna) - amount required by the contract
 //       }, {
 //         origin: 'terraclassictestnet',
 //         destination: 'solanatestnet',
-//         amount: 383215, // Taxa local em microLUNA (uluna) - valor exigido pelo contrato
+//         amount: 383215, // Local fee in microLUNA (uluna) - amount required by the contract
 //       },{
 //         origin: 'terraclassictestnet',
 //         destination: 'sepolia',
-//         amount: 383215, // Taxa local em microLUNA (uluna) - valor exigido pelo contrato
+//         amount: 383215, // Local fee in microLUNA (uluna) - amount required by the contract
 //       }
 //     ],
 //   },

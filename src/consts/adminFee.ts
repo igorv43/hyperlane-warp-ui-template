@@ -1,41 +1,41 @@
 /**
- * Taxa administrativa — cobrada por transferência para manter a UI no ar.
+ * Administrative fee — charged per transfer to keep the UI running.
  *
- * 100% CONFIGURÁVEL por quem hospeda (projeto descentralizado): cada operador
- * informa AS PRÓPRIAS carteiras no .env. Sem carteira definida numa chain, a taxa
- * fica DESLIGADA nela — nada é cobrado (default seguro para quem baixa e não configura).
+ * 100% CONFIGURABLE by whoever hosts it (decentralized project): each operator
+ * provides THEIR OWN wallets in the .env. Without a wallet set for a chain, the fee
+ * is DISABLED on it — nothing is charged (safe default for those who download and don't configure).
  *
- * O valor é FIXO em USD e convertido em tempo real para a moeda NATIVA da chain de
- * origem (LUNC/BNB/ETH/SOL) na hora do envio — ver src/features/transfer/adminFee.
+ * The amount is FIXED in USD and converted in real time to the NATIVE currency of the
+ * origin chain (LUNC/BNB/ETH/SOL) at send time — see src/features/transfer/adminFee.
  *
- * IMPORTANTE (Next.js): variáveis NEXT_PUBLIC_* são embutidas no BUILD. Quem
- * self-hospeda define os valores e builda a própria imagem.
+ * IMPORTANT (Next.js): NEXT_PUBLIC_* variables are embedded at BUILD time. Whoever
+ * self-hosts sets the values and builds their own image.
  */
 
 export interface AdminFeeChain {
-  /** carteira que RECEBE a taxa, no formato nativo da chain */
+  /** wallet that RECEIVES the fee, in the chain's native format */
   recipient: string;
-  /** símbolo do nativo, só para exibição */
+  /** native token symbol, for display only */
   nativeSymbol: string;
-  /** casas decimais do nativo (LUNC 6, BNB/ETH 18, SOL 9) */
+  /** native token decimals (LUNC 6, BNB/ETH 18, SOL 9) */
   nativeDecimals: number;
-  /** cosmos: denom do nativo (bank MsgSend) */
+  /** cosmos: denom of the native token (bank MsgSend) */
   nativeDenom?: string;
-  /** par na Binance para preço em tempo real (fonte primária) */
+  /** Binance pair for the real-time price (primary source) */
   binanceSymbol?: string;
-  /** id no CoinGecko (fonte de fallback) */
+  /** CoinGecko id (fallback source) */
   coinGeckoId?: string;
 }
 
-/** Valor fixo da taxa, em USD. Ajustável por env (default $0,50). */
+/** Fixed fee amount, in USD. Adjustable via env (default $0.50). */
 export const ADMIN_FEE_USD = (() => {
   const v = Number(process.env.NEXT_PUBLIC_ADMIN_FEE_USD);
   return Number.isFinite(v) && v >= 0 ? v : 0.5;
 })();
 
 /**
- * Mapa fixo dos metadados de cada chain (nativo/decimais/preço). As CARTEIRAS vêm
- * do .env — troque livremente. A chave é o chainName exato do registry Hyperlane.
+ * Fixed map of each chain's metadata (native token/decimals/price). The WALLETS come
+ * from the .env — swap them freely. The key is the exact chainName from the Hyperlane registry.
  */
 export const ADMIN_FEE_CHAINS: Record<string, AdminFeeChain> = {
   terraclassic: {
@@ -70,8 +70,8 @@ export const ADMIN_FEE_CHAINS: Record<string, AdminFeeChain> = {
 };
 
 /**
- * Retorna a config da taxa para a chain SÓ SE houver carteira definida.
- * Sem carteira (ou taxa zerada) → undefined = taxa desligada nessa chain.
+ * Returns the fee config for the chain ONLY IF a wallet is set.
+ * No wallet (or zero fee) → undefined = fee disabled on that chain.
  */
 export function getAdminFeeChain(chainName?: string): AdminFeeChain | undefined {
   if (!chainName || ADMIN_FEE_USD <= 0) return undefined;
@@ -80,7 +80,7 @@ export function getAdminFeeChain(chainName?: string): AdminFeeChain | undefined 
   return c;
 }
 
-/** true se existe alguma chain com taxa configurada (para exibir avisos gerais). */
+/** true if any chain has the fee configured (to show general notices). */
 export function isAdminFeeEnabledAnywhere(): boolean {
   return ADMIN_FEE_USD > 0 && Object.values(ADMIN_FEE_CHAINS).some((c) => !!c.recipient);
 }

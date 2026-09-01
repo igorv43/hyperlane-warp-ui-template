@@ -1,9 +1,9 @@
 /**
- * Cotação da taxa administrativa — converte o valor fixo em USD para a moeda NATIVA
- * da chain de origem, com preço em TEMPO REAL.
+ * Administrative fee quote — converts the fixed USD amount to the NATIVE currency
+ * of the origin chain, with a REAL-TIME price.
  *
- * Fonte primária: Binance (ticker público, ~instantâneo). Fallback: CoinGecko.
- * Função pura (sem React) para ser reusada na UI (hook) e na hora do envio.
+ * Primary source: Binance (public ticker, ~instant). Fallback: CoinGecko.
+ * Pure function (no React) so it can be reused in the UI (hook) and at send time.
  */
 import { ADMIN_FEE_USD, AdminFeeChain, getAdminFeeChain } from '../../../consts/adminFee';
 import { logger } from '../../../utils/logger';
@@ -12,11 +12,11 @@ export interface AdminFeeQuote {
   chainName: string;
   chain: AdminFeeChain;
   feeUsd: number;
-  priceUsd: number; // preço do nativo em USD
+  priceUsd: number; // price of the native token in USD
   source: 'binance' | 'coingecko';
-  /** quantidade da taxa na menor unidade do nativo (uluna/wei/lamports), como string */
+  /** fee amount in the native token's smallest unit (uluna/wei/lamports), as a string */
   amountBaseUnits: string;
-  /** quantidade "humana" já formatada p/ exibição (ex.: "8,333.5 LUNC") */
+  /** "human" amount already formatted for display (e.g. "8,333.5 LUNC") */
   amountHuman: string;
 }
 
@@ -48,11 +48,11 @@ async function fetchCoinGeckoPrice(id?: string): Promise<number | null> {
   }
 }
 
-/** feeUsd / price -> unidades-base do nativo, arredondando para CIMA (nunca cobra a menos). */
+/** feeUsd / price -> base units of the native token, rounding UP (never undercharge). */
 function usdToBaseUnits(feeUsd: number, priceUsd: number, decimals: number): string {
-  const human = feeUsd / priceUsd; // quantidade no nativo (float)
-  // decimals <= 18 e valores pequenos: seguro dentro de Number, mas fazemos em duas
-  // etapas para minimizar perda: parte inteira + fração escalada.
+  const human = feeUsd / priceUsd; // amount in the native token (float)
+  // decimals <= 18 and small values: safe within Number, but we do it in two
+  // steps to minimize loss: integer part + scaled fraction.
   const scaled = human * Math.pow(10, decimals);
   return BigInt(Math.ceil(scaled)).toString();
 }
@@ -64,9 +64,9 @@ function formatHuman(baseUnits: string, decimals: number, symbol: string): strin
 }
 
 /**
- * Cota a taxa para uma chain. Retorna null se a taxa está desligada nessa chain
- * (sem carteira) OU se NENHUMA fonte de preço respondeu (aí o envio segue sem taxa,
- * nunca travamos a transferência do usuário por um soluço de preço).
+ * Quotes the fee for a chain. Returns null if the fee is disabled on that chain
+ * (no wallet) OR if NO price source responded (in that case the send proceeds without
+ * the fee — we never block the user's transfer over a price hiccup).
  */
 export async function quoteAdminFee(chainName?: string): Promise<AdminFeeQuote | null> {
   const chain = getAdminFeeChain(chainName);
@@ -79,7 +79,7 @@ export async function quoteAdminFee(chainName?: string): Promise<AdminFeeQuote |
     source = 'coingecko';
   }
   if (!priceUsd) {
-    logger.warn(`[adminFee] sem preço para ${chain.nativeSymbol} — taxa pulada nesta tx`);
+    logger.warn(`[adminFee] no price for ${chain.nativeSymbol} — fee skipped for this tx`);
     return null;
   }
 

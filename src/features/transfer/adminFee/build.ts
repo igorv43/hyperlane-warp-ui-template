@@ -1,14 +1,14 @@
 /**
- * Construtores do pagamento da taxa por protocolo. Cada um devolve algo que será
- * ANEXADO à MESMA transação do envio (uma só aprovação):
- *  - Cosmos: um MsgSend (bank) para entrar no signAndBroadcast junto do warp
- *  - Solana: uma instrução SystemProgram.transfer para somar ao Transaction do warp
- *  - EVM:    um {to, value} para o batch EIP-5792 (ou tx separada no fallback)
+ * Fee-payment builders per protocol. Each one returns something that will be
+ * ATTACHED to the SAME send transaction (a single approval):
+ *  - Cosmos: a MsgSend (bank) to go into signAndBroadcast alongside the warp
+ *  - Solana: a SystemProgram.transfer instruction to add to the warp's Transaction
+ *  - EVM:    a {to, value} for the EIP-5792 batch (or a separate tx in the fallback)
  */
 import { PublicKey, SystemProgram, TransactionInstruction } from '@solana/web3.js';
 import type { AdminFeeQuote } from './quote';
 
-/** EncodeObject do MsgSend nativo (cosmjs registra este typeUrl por padrão). */
+/** EncodeObject of the native MsgSend (cosmjs registers this typeUrl by default). */
 export function buildCosmosFeeMsg(sender: string, quote: AdminFeeQuote) {
   return {
     typeUrl: '/cosmos.bank.v1beta1.MsgSend',
@@ -20,7 +20,7 @@ export function buildCosmosFeeMsg(sender: string, quote: AdminFeeQuote) {
   };
 }
 
-/** Instrução de transferência de SOL (lamports) para a carteira da taxa. */
+/** SOL (lamports) transfer instruction to the fee wallet. */
 export function buildSolanaFeeInstruction(
   sender: PublicKey,
   quote: AdminFeeQuote,
@@ -32,7 +32,7 @@ export function buildSolanaFeeInstruction(
   });
 }
 
-/** Call nativo EVM: envia `value` (wei) para a carteira da taxa, sem calldata. */
+/** Native EVM call: sends `value` (wei) to the fee wallet, with no calldata. */
 export function buildEvmFeeCall(quote: AdminFeeQuote): { to: `0x${string}`; value: bigint } {
   return {
     to: quote.chain.recipient as `0x${string}`,
