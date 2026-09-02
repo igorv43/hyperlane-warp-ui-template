@@ -59,6 +59,23 @@ A flat USD fee charged per transfer, converted in real time to the origin chain'
 | `NEXT_PUBLIC_TRANSFER_BLACKLIST` / `NEXT_PUBLIC_CHAIN_WALLET_WHITELISTS` | Route/wallet filters |
 | `NEXT_PUBLIC_SENTRY_DSN`, `NEXT_PUBLIC_VERSION`, `NEXT_PUBLIC_REFINER_*` | Telemetry (optional) |
 
+### Solana private RPC (server-side proxy)
+
+A paid Solana RPC (Helius, Alchemy, …) must **never** be exposed with a `NEXT_PUBLIC_*`
+variable — anything baked into the client bundle is visible to every visitor. The app
+ships a server-side proxy at [`/api/rpc/solana`](./src/pages/api/rpc/solana.ts) that
+keeps the key on the server:
+
+| Variable | Kind | Description |
+| --- | --- | --- |
+| `SOLANA_RPC_URL` | **runtime, server-only** | The paid RPC URL **with** its API key, e.g. `https://mainnet.helius-rpc.com/?api-key=<YOUR_API_KEY>`. Read at request time by the proxy; never reaches the browser. |
+| `SOLANA_RPC_ALLOWED_ORIGINS` | runtime, server-only | Comma-separated origins allowed to use the proxy (protects the paid quota). Defaults to the bridge domains. |
+| `NEXT_PUBLIC_RPC_OVERRIDES` | build | Point the UI at the proxy (public URL, no secret): `{"solanamainnet":{"http":"https://bridge.terra-classic.io/api/rpc/solana"}}` — the value must be **valid JSON**, chain name → URL. |
+| `NEXT_PUBLIC_SOLANA_WS_URL` | build | Public websocket used only for tx-confirmation subscriptions (default `wss://api.mainnet-beta.solana.com/`). No secret. |
+
+Quick check after deploying: `GET /api/rpc/solana` must answer **405** (the proxy is
+POST-only), and a JSON-RPC `getHealth` POST from an allowed origin must answer `ok`.
+
 Full template in [`.env.example`](./.env.example).
 
 Routes and branding: `src/consts/warpRoutes.yaml` (tokens), `src/consts/chains.yaml` (chains), `src/consts/app.ts` (name/colors/logos).
