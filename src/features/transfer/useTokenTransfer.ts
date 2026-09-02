@@ -26,6 +26,7 @@ import { useMultiProvider } from '../chains/hooks';
 import { getChainDisplayName } from '../chains/utils';
 import { AppState, useStore } from '../store';
 import { getTokenByIndex, useWarpCore } from '../tokens/hooks';
+import { checkOriginNativeGasBalance, friendlyInsufficientFundsError } from './nativeGasCheck';
 import { TransferContext, TransferFormValues, TransferStatus } from './types';
 import { tryGetMsgIdFromTransferReceipt } from './utils';
 
@@ -151,6 +152,23 @@ async function executeTransfer({
     if (!isCollateralSufficient) {
       toast.error('Insufficient collateral on destination for transfer');
       throw new Error('Insufficient destination collateral');
+    }
+
+    // Pre-flight: the origin's NATIVE token pays gas + fees even when sending
+    // another token; an empty balance would otherwise fail inside wallet
+    // signing with an opaque error (hours-to-debug UX).
+    const nativeGasError = await checkOriginNativeGasBalance({
+      warpCore,
+      multiProvider,
+      originTokenAmount,
+      destination,
+      recipient,
+      sender,
+      adminFeeBaseUnits: feeQuote?.amountBaseUnits,
+    });
+    if (nativeGasError) {
+      toast.error(nativeGasError, { autoClose: 15000 });
+      throw new Error('Insufficient native token balance for gas and fees');
     }
 
     addTransfer({
@@ -423,7 +441,9 @@ async function executeTransfer({
         `Transaction timed out, ${getChainDisplayName(multiProvider, origin)} may be busy. Please try again.`,
       );
     } else {
-      toast.error(errorMessages[transferStatus] || 'Unable to transfer tokens.');
+      const fundsError = friendlyInsufficientFundsError(errorDetails, multiProvider, origin);
+      if (fundsError) toast.error(fundsError, { autoClose: 15000 });
+      else toast.error(errorMessages[transferStatus] || 'Unable to transfer tokens.');
     }
   }
 
