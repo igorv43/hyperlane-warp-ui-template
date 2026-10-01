@@ -23,11 +23,11 @@ export function FeeSectionButton({
           <Skeleton className="h-4 w-72" />
         ) : fees ? (
           <button
-            className="flex w-fit items-center text-xxs text-gray-600 hover:text-gray-500 [&_path]:fill-gray-600 [&_path]:hover:fill-gray-500"
+            className="flex w-fit items-center text-xxs text-gray-400 hover:text-gray-300 [&_path]:fill-gray-400 [&_path]:hover:fill-gray-300"
             type="button"
             onClick={open}
           >
-            <FuelPumpIcon width={14} height={14} color={Color.gray[600]} className="mr-1" />
+            <FuelPumpIcon width={14} height={14} color={Color.gray[400]} className="mr-1" />
             Fees: {fees.totalFees}
             <ChevronIcon direction="e" width="0.6rem" height="0.6rem" />
           </button>

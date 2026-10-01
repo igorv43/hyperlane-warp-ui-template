@@ -25,12 +25,10 @@ const footerLinks: FooterLink[] = [
 
 export function Footer() {
   return (
-    <footer className="relative text-white">
-      <div className="relative bg-gradient-to-b from-transparent to-black/40 px-8 pb-5 pt-2 sm:pt-0">
-        <div className="flex flex-col items-center justify-between gap-8 sm:flex-row sm:gap-10">
-          <FooterLogo />
-          <FooterNav />
-        </div>
+    <footer className="relative px-4 pb-6 pt-4 text-white">
+      <div className="flex flex-col items-center gap-4">
+        <FooterLogo />
+        <FooterNav />
       </div>
     </footer>
   );
@@ -38,13 +36,13 @@ export function Footer() {
 
 function FooterLogo() {
   return (
-    <div className="flex items-center justify-center">
-      <div className="ml-2 h-12 w-12 sm:h-14 sm:w-14">
+    <div className="flex flex-col items-center gap-1.5 opacity-80">
+      <div className="h-6 w-6">
         <HyperlaneLogo color={Color.white} />
       </div>
-      <div className="ml-6 space-y-1 text-lg font-medium sm:text-xl">
-        <div>Go interchain</div>
-        <div>with Hyperlane</div>
+      <div className="text-center text-xs leading-tight text-gray-400">
+        <div>Powered by</div>
+        <div className="font-medium text-white">Hyperlane</div>
       </div>
     </div>
   );
@@ -52,17 +50,17 @@ function FooterLogo() {
 
 function FooterNav() {
   return (
-    <nav className="text-md font-medium">
-      <ul style={{ gridTemplateColumns: 'auto auto auto' }} className="grid gap-x-7 gap-y-1.5">
+    <nav>
+      <ul className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs font-medium text-gray-400">
         {footerLinks.map((item) => (
           <li key={item.title}>
             <Link
-              className="flex items-center capitalize underline-offset-2 hover:underline"
+              className="flex items-center gap-1.5 capitalize transition-colors hover:text-white"
               target={item.external ? '_blank' : '_self'}
               href={item.url}
             >
-              {item?.icon && <div className="mr-3 mt-1 w-4">{item?.icon}</div>}
-              {!item?.icon && <div>{item.title}</div>}
+              {item?.icon && <div className="w-3.5 opacity-80">{item?.icon}</div>}
+              <span>{item.title}</span>
             </Link>
           </li>
         ))}

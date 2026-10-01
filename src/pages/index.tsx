@@ -1,13 +1,13 @@
 import type { NextPage } from 'next';
+import { Hero } from '../components/hero/Hero';
 import { FloatingButtonStrip } from '../components/nav/FloatingButtonStrip';
-import { TipCard } from '../components/tip/TipCard';
 import { TransferTokenCard } from '../features/transfer/TransferTokenCard';
 
 const Home: NextPage = () => {
   return (
-    <div className="space-y-3 pt-4">
-      <TipCard />
-      <div className="relative">
+    <div className="flex flex-col items-center space-y-1 pt-2">
+      <Hero />
+      <div className="relative mt-2 w-full max-w-100 sm:max-w-[31rem]">
         <TransferTokenCard />
         <FloatingButtonStrip />
       </div>

@@ -11,5 +11,3 @@ export const APP_NAME = 'Terra Classic Bridge';
 export const APP_DESCRIPTION = 'A DApp for Hyperlane Warp Route transfers';
 export const APP_URL = 'hyperlane-warp-template.vercel.app';
 export const BRAND_COLOR = Color.black;
-export const BACKGROUND_COLOR = Color.black;
-export const BACKGROUND_IMAGE = 'url(/backgrounds/main.png)';

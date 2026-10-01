@@ -62,20 +62,29 @@ export function SideBarMenu({
   return (
     <>
       <div
-        className={`fixed right-0 top-0 h-full w-88 transform bg-white bg-opacity-95 shadow-lg transition-transform duration-100 ease-in ${
-          isMenuOpen ? 'z-10 translate-x-0' : 'z-0 translate-x-full'
+        className={`fixed right-0 top-0 z-20 h-full w-full max-w-[22rem] transform border-l border-white/10 bg-[#0a0a0f]/95 shadow-2xl backdrop-blur-2xl transition-transform duration-300 ease-in-out ${
+          isMenuOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
         {isMenuOpen && (
           <button
-            className="absolute left-0 top-0 flex h-full w-9 -translate-x-full items-center justify-center rounded-l-md bg-white bg-opacity-60 transition-all hover:bg-opacity-80"
+            className="absolute left-0 top-0 hidden h-full w-9 -translate-x-full items-center justify-center rounded-l-md bg-white/10 backdrop-blur-md transition-all hover:bg-white/20 sm:flex"
             onClick={() => onClose()}
           >
-            <Image src={CollapseIcon} width={15} height={24} alt="" />
+            <Image src={CollapseIcon} width={15} height={24} alt="" className="invert" />
           </button>
         )}
         <div className="flex h-full w-full flex-col overflow-y-auto">
-          <div className="w-full rounded-t-md bg-primary-500 px-3.5 py-2 text-base font-normal tracking-wider text-white">
+          <div className="flex items-center justify-between border-b border-white/10 px-4 py-3.5 text-base font-medium tracking-wide text-white sm:hidden">
+            <span>Menu</span>
+            <button
+              onClick={() => onClose()}
+              className="rounded-full p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-white"
+            >
+              ✕
+            </button>
+          </div>
+          <div className="w-full bg-gradient-to-r from-primary-600/40 to-accent-600/40 px-3.5 py-2.5 text-sm font-medium uppercase tracking-[0.2em] text-gray-200">
             Connected Wallets
           </div>
           <AccountList
@@ -85,11 +94,11 @@ export function SideBarMenu({
             className="px-3 py-3"
             chainName={originChainName}
           />
-          <div className="mb-4 w-full bg-primary-500 px-3.5 py-2 text-base font-normal tracking-wider text-white">
+          <div className="mb-4 w-full bg-gradient-to-r from-primary-600/40 to-accent-600/40 px-3.5 py-2.5 text-sm font-medium uppercase tracking-[0.2em] text-gray-200">
             Transfer History
           </div>
           <div className="flex grow flex-col px-3.5">
-            <div className="flex w-full grow flex-col divide-y">
+            <div className="flex w-full grow flex-col divide-y divide-white/10">
               {sortedTransfers?.length > 0 &&
                 sortedTransfers.map((t, i) => (
                   <TransferSummary
@@ -101,11 +110,14 @@ export function SideBarMenu({
                     }}
                   />
                 ))}
+              {sortedTransfers?.length === 0 && (
+                <div className="py-10 text-center text-sm text-gray-500">No transfers yet</div>
+              )}
             </div>
             {sortedTransfers?.length > 0 && (
               <button onClick={resetTransfers} className={`${styles.btn} mx-2 my-5`}>
-                <Image className="mr-4" src={ResetIcon} width={17} height={17} alt="" />
-                <span className="text-sm font-normal text-gray-900">Reset transaction history</span>
+                <Image className="mr-4 opacity-70" src={ResetIcon} width={17} height={17} alt="" />
+                <span className="text-sm font-normal text-gray-300">Reset transaction history</span>
               </button>
             )}
           </div>
@@ -142,21 +154,21 @@ function TransferSummary({
   return (
     <button key={timestamp} onClick={onClick} className={`${styles.btn} justify-between py-3`}>
       <div className="flex gap-2.5">
-        <div className="flex h-[2.25rem] w-[2.25rem] flex-col items-center justify-center rounded-full bg-gray-100 px-1.5">
+        <div className="flex h-[2.25rem] w-[2.25rem] flex-col items-center justify-center rounded-full bg-white/10 px-1.5">
           <ChainLogo chainName={origin} size={20} />
         </div>
         <div className="flex flex-col">
           <div className="flex flex-col">
             <div className="items flex items-baseline">
-              <span className="text-sm font-normal text-gray-800">{amount}</span>
-              <span className="ml-1 text-sm font-normal text-gray-800">{token?.symbol || ''}</span>
+              <span className="text-sm font-normal text-white">{amount}</span>
+              <span className="ml-1 text-sm font-normal text-white">{token?.symbol || ''}</span>
             </div>
             <div className="mt-1 flex flex-row items-center">
-              <span className="text-xxs font-normal tracking-wide text-gray-900">
+              <span className="text-xxs font-normal tracking-wide text-gray-400">
                 {getChainDisplayName(multiProvider, origin, true)}
               </span>
-              <Image className="mx-1" src={ArrowRightIcon} width={10} height={10} alt="" />
-              <span className="text-xxs font-normal tracking-wide text-gray-900">
+              <Image className="mx-1 opacity-60" src={ArrowRightIcon} width={10} height={10} alt="" />
+              <span className="text-xxs font-normal tracking-wide text-gray-400">
                 {getChainDisplayName(multiProvider, destination, true)}
               </span>
             </div>
@@ -175,5 +187,5 @@ function TransferSummary({
 }
 
 const styles = {
-  btn: 'w-full flex items-center px-1 py-2 text-sm hover:bg-gray-200 active:scale-95 transition-all duration-500 cursor-pointer rounded-sm',
+  btn: 'w-full flex items-center px-1 py-2 text-sm hover:bg-white/10 active:scale-95 transition-all duration-500 cursor-pointer rounded-sm',
 };

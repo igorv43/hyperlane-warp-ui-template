@@ -4,6 +4,7 @@ import { useField, useFormikContext } from 'formik';
 import { useCallback, useState } from 'react';
 import { toast } from 'react-toastify';
 import { ChainLogo } from '../../components/icons/ChainLogo';
+import { Color } from '../../styles/Color';
 import { logger } from '../../utils/logger';
 import { EVENT_NAME } from '../analytics/types';
 import { trackEvent } from '../analytics/utils';
@@ -83,13 +84,13 @@ export function ChainSelectField({
             <ChainLogo chainName={field.value} size={32} />
           </div>
           <div className="flex flex-col items-start gap-1">
-            <label htmlFor={name} className="text-xs text-gray-600">
+            <label htmlFor={name} className="text-xs text-gray-400">
               {label}
             </label>
             {displayName}
           </div>
         </div>
-        <ChevronIcon width={12} height={8} direction="s" />
+        <ChevronIcon width={12} height={8} direction="s" color={Color.gray['400']} />
       </button>
       {canAddAsset && (
         <button
@@ -113,9 +114,9 @@ export function ChainSelectField({
 }
 
 const styles = {
-  base: 'px-2 py-1.5 w-full flex items-center justify-between text-sm bg-white rounded-lg border border-primary-300 outline-none transition-colors duration-500',
-  enabled: 'hover:bg-gray-100 active:scale-95 focus:border-primary-500',
-  disabled: 'bg-gray-150 cursor-default',
+  base: 'px-2 py-1.5 w-full flex items-center justify-between text-sm text-white bg-white/5 rounded-lg border border-white/10 outline-none transition-colors duration-500',
+  enabled: 'hover:bg-white/10 active:scale-95 focus:border-accent-400',
+  disabled: 'bg-white/[0.03] cursor-default text-gray-400',
   addButton:
-    'flex text-xxs text-primary-500 hover:text-primary-600 disabled:text-gray-500 [&_path]:fill-primary-500 [&_path]:hover:fill-primary-600 [&_path]:disabled:fill-gray-500',
+    'flex text-xxs text-accent-300 hover:text-accent-200 disabled:text-gray-500 [&_path]:fill-accent-300 [&_path]:hover:fill-accent-200 [&_path]:disabled:fill-gray-500',
 };

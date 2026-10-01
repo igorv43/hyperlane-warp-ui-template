@@ -33,7 +33,7 @@ export function ConnectAwareSubmitButton<FormValues = any>({
   const hasError = Object.keys(touched).length > 0 && Object.keys(errors).length > 0;
   const firstError = `${Object.values(errors)[0]}` || 'Unknown error';
 
-  const color = hasError ? 'red' : 'accent';
+  const color = hasError ? 'red' : 'gradient';
   const content = hasError ? firstError : isAccountReady ? text : 'Connect wallet';
   const type =
     disabled || !isAccountReady

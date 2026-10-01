@@ -1,6 +1,6 @@
 import { MultiProtocolProvider } from '@hyperlane-xyz/sdk';
 import { getWagmiChainConfigs } from '@hyperlane-xyz/widgets';
-import { RainbowKitProvider, connectorsForWallets, lightTheme } from '@rainbow-me/rainbowkit';
+import { RainbowKitProvider, connectorsForWallets, darkTheme } from '@rainbow-me/rainbowkit';
 import '@rainbow-me/rainbowkit/styles.css';
 import {
   argentWallet,
@@ -58,8 +58,8 @@ export function EvmWalletContext({ children }: PropsWithChildren<unknown>) {
   return (
     <WagmiProvider config={wagmiConfig}>
       <RainbowKitProvider
-        theme={lightTheme({
-          accentColor: Color.primary['500'],
+        theme={darkTheme({
+          accentColor: Color.accent['500'],
           borderRadius: 'small',
           fontStack: 'system',
         })}

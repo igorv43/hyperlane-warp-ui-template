@@ -3,6 +3,7 @@ import { ChevronIcon } from '@hyperlane-xyz/widgets';
 import { useField, useFormikContext } from 'formik';
 import { useMemo, useState } from 'react';
 import { TokenIcon } from '../../components/icons/TokenIcon';
+import { Color } from '../../styles/Color';
 
 import { WARP_QUERY_PARAMS } from '../../consts/args';
 import { updateQueryParam, updateQueryParams } from '../../utils/queryParams';
@@ -109,17 +110,17 @@ function TokenButton({
     >
       <div className="flex items-center">
         {token && <TokenIcon token={token} size={20} />}
-        <span className={`ml-2 ${!token?.symbol && 'text-slate-400'}`}>
+        <span className={`ml-2 ${!token?.symbol ? 'text-gray-500' : 'text-white'}`}>
           {token?.symbol || (isAutomatic ? 'No routes available' : 'Select Token')}
         </span>
       </div>
-      <ChevronIcon width={12} height={8} direction="s" />
+      <ChevronIcon width={12} height={8} direction="s" color={Color.gray['400']} />
     </button>
   );
 }
 
 const styles = {
-  base: 'mt-1.5 w-full px-2.5 py-2.5 flex items-center justify-between text-sm rounded-lg border border-primary-300 outline-none transition-colors duration-500',
-  enabled: 'hover:bg-gray-100 active:scale-95 focus:border-primary-500',
-  disabled: 'bg-gray-100 cursor-default',
+  base: 'mt-1.5 w-full px-2.5 py-2.5 flex items-center justify-between text-sm bg-white/5 rounded-lg border border-white/10 outline-none transition-colors duration-500',
+  enabled: 'hover:bg-white/10 active:scale-95 focus:border-accent-400',
+  disabled: 'bg-white/[0.03] cursor-default',
 };

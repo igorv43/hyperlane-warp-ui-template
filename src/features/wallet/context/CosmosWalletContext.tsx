@@ -30,7 +30,7 @@ export function CosmosWalletContext({ children }: PropsWithChildren<unknown>) {
   // TODO replace Chakra here with a custom modal for ChainProvider
   // Using Chakra + @cosmos-kit/react instead of @cosmos-kit/react-lite adds about 600Kb to the bundle
   return (
-    <ChakraProvider theme={theme}>
+    <ChakraProvider theme={theme} resetCSS={false}>
       <ChainProvider
         chains={chains}
         assetLists={assets}
@@ -60,7 +60,7 @@ export function CosmosWalletContext({ children }: PropsWithChildren<unknown>) {
             };
           },
         }}
-        modalTheme={{ defaultTheme: 'light' }}
+        modalTheme={{ defaultTheme: 'dark' }}
       >
         {children}
       </ChainProvider>

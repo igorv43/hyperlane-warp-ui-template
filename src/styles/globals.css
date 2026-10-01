@@ -11,6 +11,7 @@ body {
   padding: 0;
   margin: 0;
 background-color: #050508 !important;
+color: #e5e7eb;
 }
 
 a {
@@ -271,5 +272,68 @@ button[data-testid="rk-connect-button"]:hover {
 
   /* fallback para ícone escuro */
   filter: brightness(0) invert(1);
+}
+
+/*
+Dark theme overrides for @hyperlane-xyz/widgets' shared <Modal> component
+(used by every modal/drawer in the app: wallet protocol picker, chain/token
+select, add route, transfer fee, recipient confirmation, transfer history...).
+The component hardcodes light-theme `htw-*` classes with no theme prop, so we
+override them globally here instead of patching the package.
+*/
+.htw-bg-white {
+  background-color: rgba(14, 16, 28, 0.5) !important;
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 0 0 1px rgba(95, 222, 201, 0.08),
+    0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.htw-text-gray-700,
+.htw-text-gray-800 {
+  color: #f3f4f6 !important;
+}
+
+.htw-text-gray-600,
+.htw-text-gray-500,
+.htw-text-gray-400 {
+  color: #9ca3af !important;
+}
+
+.htw-border-gray-200,
+.htw-border-gray-300 {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.hover\:htw-bg-gray-100:hover,
+.hover\:htw-bg-gray-50:hover,
+.hover\:htw-bg-gray-200:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.htw-bg-gray-50,
+.htw-bg-gray-100 {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.htw-bg-gray-200 {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/*
+@hyperlane-xyz/widgets icons fall back to ColorPalette.Black (#010101) as a
+hardcoded SVG `fill` attribute whenever the call site doesn't pass a `color`
+prop (e.g. AccountList's WalletIcon/LogoutIcon, Modal's close XCircleIcon,
+SearchMenu's PencilIcon/PlusIcon...). A `fill` presentation attribute has no
+CSS specificity, so a plain selector is enough to override every instance at
+once without touching colored, non-widget SVGs (brand wallet logos render as
+<img>, not inline SVG, so they're unaffected).
+*/
+svg path[fill='#010101'],
+svg path[fill='#000000'],
+svg path[fill='black'] {
+  fill: #d1d5db !important;
 }
 

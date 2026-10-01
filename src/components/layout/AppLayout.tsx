@@ -1,7 +1,7 @@
 import { MultiProtocolWalletModal } from '@hyperlane-xyz/widgets';
 import Head from 'next/head';
 import { PropsWithChildren, useEffect } from 'react';
-import { APP_NAME, BACKGROUND_COLOR, BACKGROUND_IMAGE } from '../../consts/app';
+import { APP_NAME } from '../../consts/app';
 import { config } from '../../consts/config';
 import { initRefiner } from '../../features/analytics/refiner';
 import { EVENT_NAME } from '../../features/analytics/types';
@@ -11,6 +11,7 @@ import { useStore } from '../../features/store';
 import { SideBarMenu } from '../../features/wallet/SideBarMenu';
 import { Footer } from '../nav/Footer';
 import { Header } from '../nav/Header';
+import { BackgroundFX } from './BackgroundFX';
 
 export function AppLayout({ children }: PropsWithChildren) {
   const { showEnvSelectModal, setShowEnvSelectModal, isSideBarOpen, setIsSideBarOpen } = useStore(
@@ -37,15 +38,17 @@ export function AppLayout({ children }: PropsWithChildren) {
         <title>{APP_NAME}</title>
       </Head>
       <div
-        style={styles.container}
         id="app-content"
         className="min-w-screen relative flex h-full min-h-screen w-full flex-col justify-between"
       >
-        <Header />
-        <div className="mx-auto flex max-w-screen-xl grow items-center sm:px-4">
-          <main className="my-4 flex w-full flex-1 items-center justify-center">{children}</main>
+        <BackgroundFX />
+        <div className="relative z-10 flex h-full min-h-screen w-full flex-col justify-between">
+          <Header />
+          <div className="mx-auto flex max-w-screen-xl grow items-center sm:px-4">
+            <main className="my-4 flex w-full flex-1 items-center justify-center">{children}</main>
+          </div>
+          <Footer />
         </div>
-        <Footer />
       </div>
 
       <MultiProtocolWalletModal
@@ -64,13 +67,3 @@ export function AppLayout({ children }: PropsWithChildren) {
     </>
   );
 }
-
-const styles = {
-  container: {
-    backgroundColor: BACKGROUND_COLOR,
-    backgroundImage: BACKGROUND_IMAGE,
-    backgroundSize: 'cover',
-    backgroundRepeat: 'no-repeat',
-    backgroundPosition: 'center',
-  },
-};

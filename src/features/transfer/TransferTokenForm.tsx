@@ -285,7 +285,7 @@ function TokenSection({
 }) {
   return (
     <div className="flex-1">
-      <label htmlFor="tokenIndex" className="block pl-0.5 text-sm text-gray-600">
+      <label htmlFor="tokenIndex" className="block pl-0.5 text-sm text-gray-400">
         Token
       </label>
       <TokenSelectField name="tokenIndex" disabled={isReview} setIsNft={setIsNft} />
@@ -305,7 +305,7 @@ function AmountSection({ isNft, isReview }: { isNft: boolean; isReview: boolean 
   return (
     <div className="flex-1">
       <div className="flex justify-between pr-1">
-        <label htmlFor="amount" className="block pl-0.5 text-sm text-gray-600">
+        <label htmlFor="amount" className="block pl-0.5 text-sm text-gray-400">
           Amount
         </label>
         <TokenBalance label="My balance" balance={balance} />
@@ -323,7 +323,7 @@ function AmountSection({ isNft, isReview }: { isNft: boolean; isReview: boolean 
             disabled={isReview}
           />
           {shouldShowPrice && !isLoading && (
-            <div className="absolute bottom-[-18px] left-1 max-w-52 overflow-hidden text-ellipsis whitespace-nowrap text-xxs text-gray-500">
+            <div className="absolute bottom-[-18px] left-1 max-w-52 overflow-hidden text-ellipsis whitespace-nowrap text-xxs text-gray-400">
               ≈$
               {totalTokenPrice.toLocaleString('en-US', {
                 minimumFractionDigits: 2,
@@ -346,7 +346,7 @@ function RecipientSection({ isReview }: { isReview: boolean }) {
   return (
     <div className="mt-4">
       <div className="flex justify-between pr-1">
-        <label htmlFor="recipient" className="block pl-0.5 text-sm text-gray-600">
+        <label htmlFor="recipient" className="block pl-0.5 text-sm text-gray-400">
           Recipient address
         </label>
         <TokenBalance label="Remote balance" balance={balance} />
@@ -366,7 +366,7 @@ function RecipientSection({ isReview }: { isReview: boolean }) {
 
 function TokenBalance({ label, balance }: { label: string; balance?: TokenAmount | null }) {
   const value = balance?.getDecimalFormattedAmount().toFixed(5) || '0';
-  return <div className="text-right text-xs text-gray-600">{`${label}: ${value}`}</div>;
+  return <div className="text-right text-xs text-gray-400">{`${label}: ${value}`}</div>;
 }
 
 function ButtonSection({
@@ -551,7 +551,7 @@ function ButtonSection({
         <SolidButton
           disabled={!addressConfirmed}
           type="button"
-          color="accent"
+          color="gradient"
           onClick={triggerTransactionsHandler}
           className="flex-1 px-3 py-1.5"
         >
@@ -706,8 +706,8 @@ function ReviewDetails({
           isReview ? 'max-h-screen duration-1000 ease-in' : 'max-h-0 duration-500'
         } overflow-hidden transition-all`}
       >
-        <label className="mt-4 block pl-0.5 text-sm text-gray-600">Transactions</label>
-        <div className="mt-1.5 space-y-2 break-all rounded border border-gray-400 bg-gray-150 px-2.5 py-2 text-sm">
+        <label className="mt-4 block pl-0.5 text-sm text-gray-400">Transactions</label>
+        <div className="mt-1.5 space-y-2 break-all rounded border border-white/10 bg-white/5 px-2.5 py-2 text-sm">
           {isLoading ? (
             <div className="flex items-center justify-center py-6">
               <SpinnerIcon className="h-5 w-5" />
@@ -717,7 +717,7 @@ function ReviewDetails({
               {isApproveRequired && (
                 <div>
                   <h4>Transaction 1: Approve Transfer</h4>
-                  <div className="ml-1.5 mt-1.5 space-y-1.5 border-l border-gray-300 pl-2 text-xs">
+                  <div className="ml-1.5 mt-1.5 space-y-1.5 border-l border-white/10 pl-2 text-xs">
                     <p>{`Router Address: ${originToken?.addressOrDenom}`}</p>
                     {originToken?.collateralAddressOrDenom && (
                       <p>{`Collateral Address: ${originToken.collateralAddressOrDenom}`}</p>
@@ -727,7 +727,7 @@ function ReviewDetails({
               )}
               <div>
                 <h4>{`Transaction${isApproveRequired ? ' 2' : ''}: Transfer Remote`}</h4>
-                <div className="ml-1.5 mt-1.5 space-y-1.5 border-l border-gray-300 pl-2 text-xs">
+                <div className="ml-1.5 mt-1.5 space-y-1.5 border-l border-white/10 pl-2 text-xs">
                   {destinationToken?.addressOrDenom && (
                     <p className="flex">
                       <span className="min-w-[7.5rem]">Remote Token</span>
@@ -781,7 +781,7 @@ function ReviewDetails({
           )}
         </div>
         {adminFeeEnabled && (
-          <p className="mt-2 px-0.5 text-xs leading-snug text-gray-500">
+          <p className="mt-2 px-0.5 text-xs leading-snug text-gray-400">
             {`Includes a fixed administration fee of $${ADMIN_FEE_USD.toFixed(2)}${
               adminFee ? ` (~${adminFee.amountHuman})` : ''
             }, charged within the same transfer (single approval) to keep this interface running.`}

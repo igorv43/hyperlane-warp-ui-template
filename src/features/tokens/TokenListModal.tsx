@@ -163,7 +163,7 @@ export function TokenList({
       {tokens.map((t, i) => (
         <button
           className={`-mx-2 mb-2 flex items-center rounded px-2 py-2 ${
-            t.disabled ? 'opacity-50' : 'hover:bg-gray-200'
+            t.disabled ? 'opacity-50' : 'hover:bg-white/10'
           } duration-250 transition-all`}
           key={i}
           type="button"
@@ -223,7 +223,7 @@ function UnsupportedRouteTokenList({
     ([symbol, { chains, tokenInformation }]) => (
       <React.Fragment key={symbol}>
         <button
-          className="duration-250 -mx-2 mb-2 flex items-center rounded px-2 py-2 opacity-50 transition-all hover:bg-gray-200"
+          className="duration-250 -mx-2 mb-2 flex items-center rounded px-2 py-2 opacity-50 transition-all hover:bg-white/10"
           type="button"
           onClick={() => setOpen((prevSymbol) => (prevSymbol === symbol ? null : symbol))}
         >
@@ -275,7 +275,7 @@ function UnsupportedRouteChainList({
       {Object.entries(chains).map(([chainName, chain]) => (
         <button
           key={chainName}
-          className="flex w-full items-center gap-4 rounded border-b border-gray-100 px-4 py-2 hover:bg-gray-200"
+          className="flex w-full items-center gap-4 rounded border-b border-gray-100 px-4 py-2 hover:bg-white/10"
           onClick={() => onSelectUnsupportedRoute(chain.token, chainName)}
         >
           <div className="shrink-0">
