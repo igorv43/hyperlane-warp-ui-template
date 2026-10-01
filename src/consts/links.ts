@@ -1,8 +1,8 @@
 export const links = {
   home: 'https://www.hyperlane.xyz',
-  explorer: 'https://explorer.hyperlane.xyz',
+  explorer: 'https://explorer.terraclassic-bridge.xyz',
   discord: 'https://discord.gg/VK9ZUy3aTV',
-  github: 'https://github.com/hyperlane-xyz/hyperlane-warp-ui-template',
+  github: 'https://github.com/terra-classic-hyperlane/UI',
   docs: 'https://docs.hyperlane.xyz',
   warpDocs: 'https://docs.hyperlane.xyz/docs/reference/applications/warp-routes',
   gasDocs: 'https://docs.hyperlane.xyz/docs/reference/hooks/interchain-gas',
