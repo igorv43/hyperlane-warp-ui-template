@@ -57,7 +57,7 @@ export default function App({ Component, pageProps }: AppProps) {
             </EvmWalletContext>
           </WarpContextInitGate>
         </QueryClientProvider>
-        <ToastContainer transition={Zoom} position="bottom-right" limit={2} />
+        <ToastContainer transition={Zoom} position="bottom-right" limit={2} theme="dark" />
       </ErrorBoundary>
     </div>
   );

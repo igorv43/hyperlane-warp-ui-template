@@ -5,9 +5,9 @@ import { TransferTokenCard } from '../features/transfer/TransferTokenCard';
 
 const Home: NextPage = () => {
   return (
-    <div className="flex flex-col items-center space-y-1 pt-2">
+    <div className="flex w-full min-w-0 flex-col items-center space-y-1 pt-2">
       <Hero />
-      <div className="relative mt-2 w-full max-w-100 sm:max-w-[31rem]">
+      <div className="relative mt-2 w-full min-w-0 max-w-[26rem] sm:max-w-[31rem]">
         <TransferTokenCard />
         <FloatingButtonStrip />
       </div>

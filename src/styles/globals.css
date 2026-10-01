@@ -150,11 +150,11 @@ Toasts
 */
 :root {
   --toastify-color-light: #ffffff;
-  --toastify-color-dark: #2e3338;
-  --toastify-color-info: #2e3338;
-  --toastify-color-success: #35d07f;
+  --toastify-color-dark: #0e101c;
+  --toastify-color-info: #2764c1;
+  --toastify-color-success: #2fcdb2;
   --toastify-color-warning: #fcd34d;
-  --toastify-color-error: #dc2626;
+  --toastify-color-error: #ef4444;
   --toastify-color-transparent: rgba(255, 255, 255, 0.7);
 
   --toastify-icon-color-info: var(--toastify-color-info);
@@ -162,23 +162,23 @@ Toasts
   --toastify-icon-color-warning: var(--toastify-color-warning);
   --toastify-icon-color-error: var(--toastify-color-error);
 
-  --toastify-toast-width: 300px;
-  --toastify-toast-background: #fff;
+  --toastify-toast-width: 320px;
+  --toastify-toast-background: #0e101c;
   --toastify-toast-min-height: 64px;
   --toastify-toast-max-height: 800px;
   --toastify-font-family: Roboto, sans-serif;
   --toastify-z-index: 9999;
 
   --toastify-text-color-light: #2e3338;
-  --toastify-text-color-dark: #fff;
+  --toastify-text-color-dark: #f3f4f6;
 
-  --toastify-text-color-info: #fff;
-  --toastify-text-color-success: #fff;
-  --toastify-text-color-warning: #fff;
-  --toastify-text-color-error: #fff;
+  --toastify-text-color-info: #f3f4f6;
+  --toastify-text-color-success: #f3f4f6;
+  --toastify-text-color-warning: #f3f4f6;
+  --toastify-text-color-error: #f3f4f6;
 
-  --toastify-spinner-color: #616161;
-  --toastify-spinner-color-empty-area: #e0e0e0;
+  --toastify-spinner-color: #9ca3af;
+  --toastify-spinner-color-empty-area: rgba(255, 255, 255, 0.1);
 
   --toastify-color-progress-light: linear-gradient(
     to right,
@@ -189,11 +189,76 @@ Toasts
     #5856d6,
     #ff2d55
   );
-  --toastify-color-progress-dark: #bb86fc;
+  --toastify-color-progress-dark: linear-gradient(to right, #2764c1, #7c6eea, #2fcdb2);
   --toastify-color-progress-info: var(--toastify-color-info);
   --toastify-color-progress-success: var(--toastify-color-success);
   --toastify-color-progress-warning: var(--toastify-color-warning);
   --toastify-color-progress-error: var(--toastify-color-error);
+}
+
+/*
+Toast notifications (success/error/warning/info) — match the futuristic glass
+theme instead of react-toastify's default flat card, with a colored glow per
+toast type so severity still reads at a glance.
+*/
+.Toastify__toast {
+  background: rgba(14, 16, 28, 0.75) !important;
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  font-family: inherit;
+}
+
+.Toastify__toast--success {
+  box-shadow:
+    0 0 0 1px rgba(47, 205, 178, 0.25),
+    0 0 24px rgba(47, 205, 178, 0.25),
+    0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.Toastify__toast--error {
+  box-shadow:
+    0 0 0 1px rgba(239, 68, 68, 0.3),
+    0 0 24px rgba(239, 68, 68, 0.25),
+    0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.Toastify__toast--warning {
+  box-shadow:
+    0 0 0 1px rgba(252, 211, 77, 0.3),
+    0 0 24px rgba(252, 211, 77, 0.2),
+    0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.Toastify__toast--info {
+  box-shadow:
+    0 0 0 1px rgba(39, 100, 193, 0.3),
+    0 0 24px rgba(39, 100, 193, 0.25),
+    0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.Toastify__toast-body {
+  color: #f3f4f6;
+}
+
+.Toastify__toast-body a {
+  color: #5fdec9;
+  text-decoration: underline;
+}
+
+.Toastify__close-button {
+  color: #f3f4f6;
+  opacity: 0.6;
+}
+
+.Toastify__close-button:hover {
+  opacity: 1;
+}
+
+.Toastify__progress-bar--bg {
+  background: rgba(255, 255, 255, 0.08);
 }
 
 /*
@@ -256,22 +321,32 @@ button[data-testid="rk-connect-button"]:hover {
 }
 /* Botão */
 .connect-wallet-wrapper button {
-  background: linear-gradient(180deg, #1a1b22, #12131a) !important;
+  background: linear-gradient(135deg, rgba(39,100,193,0.35), rgba(124,110,234,0.3), rgba(47,205,178,0.35)) !important;
+  backdrop-filter: blur(16px);
   color: #ffffff !important;
   border-radius: 14px !important;
-  border: 1px solid rgba(255,255,255,0.14) !important;
+  border: 1px solid rgba(255,255,255,0.18) !important;
+  box-shadow: 0 0 18px rgba(124,110,234,0.3), 0 0 8px rgba(47,205,178,0.25) !important;
+  transition: box-shadow 0.3s ease, transform 0.15s ease;
+}
+.connect-wallet-wrapper button:hover {
+  box-shadow: 0 0 26px rgba(124,110,234,0.45), 0 0 12px rgba(47,205,178,0.4) !important;
 }
 
-/* Qualquer ícone dentro do botão */
+/* Generic icon SVGs (the pre-connect wallet glyph, chevrons) — force white.
+   Does NOT touch <img> — that's the wallet's own branded logo and must
+   keep its real colors, not be flattened by a filter. */
 .connect-wallet-wrapper button svg,
-.connect-wallet-wrapper button svg path,
-.connect-wallet-wrapper button img {
+.connect-wallet-wrapper button svg path {
   fill: #ffffff !important;
   stroke: #ffffff !important;
   color: #ffffff !important;
+}
 
-  /* fallback para ícone escuro */
-  filter: brightness(0) invert(1);
+/* Wallet logo image: round it off with a subtle ring instead of recoloring it */
+.connect-wallet-wrapper button img {
+  border-radius: 9999px;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.25);
 }
 
 /*

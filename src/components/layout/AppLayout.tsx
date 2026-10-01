@@ -44,7 +44,7 @@ export function AppLayout({ children }: PropsWithChildren) {
         <BackgroundFX />
         <div className="relative z-10 flex h-full min-h-screen w-full flex-col justify-between">
           <Header />
-          <div className="mx-auto flex max-w-screen-xl grow items-center sm:px-4">
+          <div className="mx-auto flex w-full max-w-screen-xl grow items-center px-4">
             <main className="my-4 flex w-full flex-1 items-center justify-center">{children}</main>
           </div>
           <Footer />
