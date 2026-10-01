@@ -6,8 +6,19 @@
  * listed ones has gone stale. Proxying server-side avoids CORS entirely and
  * retries a list of upstreams instead of failing the whole transfer when one
  * of them has a bad day.
+ *
+ * The body is forwarded as a raw, untouched buffer rather than being parsed
+ * and re-serialized — see /api/rpc/terraclassic for why re-serializing an
+ * empty probe body breaks RPC health checks that some wallet libraries do
+ * before signing.
  */
 import type { NextApiRequest, NextApiResponse } from 'next';
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
 
 const DEFAULT_UPSTREAMS = [
   'https://bsc-dataseed.bnbchain.org',
@@ -23,6 +34,14 @@ const UPSTREAMS = (process.env.BSC_RPC_URLS || '')
 
 const upstreams = UPSTREAMS.length ? UPSTREAMS : DEFAULT_UPSTREAMS;
 
+async function readRawBody(req: NextApiRequest): Promise<Buffer> {
+  const chunks: Buffer[] = [];
+  for await (const chunk of req) {
+    chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
+  }
+  return Buffer.concat(chunks);
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   if (req.method === 'OPTIONS') {
@@ -32,7 +51,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const body = JSON.stringify(req.body);
+  const rawBody = await readRawBody(req);
+  const body = rawBody.length > 0 ? rawBody : undefined;
+  const contentType = req.headers['content-type'];
+
   let lastStatus = 502;
   let lastText = JSON.stringify({ error: 'Upstream RPC error' });
 
@@ -40,12 +62,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       const r = await fetch(upstream, {
         method: 'POST',
-        headers: { 'content-type': 'application/json' },
+        headers: contentType ? { 'content-type': contentType } : undefined,
         body,
       });
       if (r.ok) {
         const text = await r.text();
-        res.status(200).setHeader('content-type', 'application/json');
+        res.status(200).setHeader('content-type', r.headers.get('content-type') || 'application/json');
         return res.send(text);
       }
       lastStatus = r.status;
