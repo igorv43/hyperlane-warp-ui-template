@@ -399,16 +399,22 @@ override them globally here instead of patching the package.
 
 /*
 @hyperlane-xyz/widgets icons fall back to ColorPalette.Black (#010101) as a
-hardcoded SVG `fill` attribute whenever the call site doesn't pass a `color`
-prop (e.g. AccountList's WalletIcon/LogoutIcon, Modal's close XCircleIcon,
-SearchMenu's PencilIcon/PlusIcon...). A `fill` presentation attribute has no
-CSS specificity, so a plain selector is enough to override every instance at
-once without touching colored, non-widget SVGs (brand wallet logos render as
-<img>, not inline SVG, so they're unaffected).
+hardcoded SVG `fill` (most icons) or `stroke` (CopyIcon's two <rect>s) presentation
+attribute whenever the call site doesn't pass a `color` prop (e.g. AccountList's
+WalletIcon/LogoutIcon, Modal's close XCircleIcon, SearchMenu's PencilIcon/
+PlusIcon, CopyButton's CopyIcon...). These attributes have no CSS specificity,
+so a plain selector is enough to override every instance at once without
+touching colored, non-widget SVGs (brand wallet logos render as <img>, not
+inline SVG, so they're unaffected).
 */
-svg path[fill='#010101'],
-svg path[fill='#000000'],
-svg path[fill='black'] {
+svg [fill='#010101'],
+svg [fill='#000000'],
+svg [fill='black'] {
   fill: #d1d5db !important;
+}
+svg [stroke='#010101'],
+svg [stroke='#000000'],
+svg [stroke='black'] {
+  stroke: #d1d5db !important;
 }
 
