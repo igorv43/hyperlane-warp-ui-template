@@ -1,5 +1,5 @@
 {
-  "name": "hyperlane-ui-v2",
+  "name": "@hyperlane-xyz/warp-ui-template",
   "description": "A web app template for building Hyperlane Warp Route UIs",
   "version": "12.1.0",
   "author": "J M Rossy",
