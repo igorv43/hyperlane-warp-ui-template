@@ -4,7 +4,7 @@ import { TransferTokenForm } from './TransferTokenForm';
 
 export function TransferTokenCard() {
   return (
-    <Card className="w-full min-w-0 max-w-[26rem] sm:w-[31rem]">
+    <Card className="w-full min-w-0 max-w-[26rem] sm:max-w-[31rem] sm:w-[31rem]">
       <BridgeHistoryTabs />
       <TransferTokenForm />
     </Card>
