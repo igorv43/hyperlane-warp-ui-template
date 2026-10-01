@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 # Multi-stage build para otimizar tamanho final da imagem
 # Baseado no template oficial do Next.js para Docker
 # Otimizado para EasyPanel
@@ -23,7 +24,10 @@ COPY package.json pnpm-lock.yaml* ./
 COPY patches ./patches
 # Instalar apenas dependências de produção se necessário
 # Para build, precisamos de devDependencies também
-RUN pnpm install --frozen-lockfile
+# Cache do store do pnpm entre builds (BuildKit) — evita rebaixar os mesmos
+# pacotes toda vez que o lockfile não mudou.
+RUN --mount=type=cache,id=pnpm-store,target=/root/.local/share/pnpm/store \
+    pnpm install --frozen-lockfile
 
 # Stage 2: Builder
 FROM base AS builder
@@ -91,7 +95,12 @@ RUN : > .env.local && \
 # Build da aplicação
 # O next.config.js já está configurado com output: 'standalone'
 # e otimizações de memória
-RUN pnpm run build
+# Cache do webpack (.next/cache) entre builds (BuildKit) — sem isso, TODO
+# deploy é um build frio do zero, já que o COPY . . acima sempre invalida a
+# camada deste RUN. Com o cache mount, só os módulos que mudaram são
+# recompilados nos deploys seguintes.
+RUN --mount=type=cache,id=next-cache,target=/app/.next/cache \
+    pnpm run build
 
 # Stage 3: Runner (produção)
 FROM base AS runner
