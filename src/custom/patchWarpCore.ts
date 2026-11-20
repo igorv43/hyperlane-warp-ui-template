@@ -11,7 +11,11 @@ import {
     type MultiProtocolProvider,
 } from '@hyperlane-xyz/sdk';
 import { logger } from '../utils/logger';
-import { CwHypCollateralAdapter, CwHypNativeAdapter } from './adapters/CustomCosmWasmTokenAdapter';
+import {
+  CwHypCollateralAdapter,
+  CwHypNativeAdapter,
+  CwHypSyntheticAdapter,
+} from './adapters/CustomCosmWasmTokenAdapter';
 import {
   CustomSealevelHypCollateralAdapter,
   CustomSealevelHypNativeAdapter,
@@ -106,6 +110,34 @@ export function patchWarpCore(
       } catch (error) {
         logger.error(
           `❌ Error applying custom native adapter to token ${token.symbol} on ${token.chainName}:`,
+          error,
+        );
+      }
+    } else if (token.standard === TokenStandard.CwHypSynthetic && token.collateralAddressOrDenom) {
+      // CW20 synthetic warp: the SDK throws "not implemented" in
+      // quoteTransferRemoteGas — use the custom adapter with dynamic on-chain
+      // IGP quoting.
+      try {
+        const originalGetHypAdapter = token.getHypAdapter.bind(token);
+        // @ts-ignore - Overriding a Token method
+        token.getHypAdapter = function(multiProviderArg: MultiProtocolProvider, destination?: any) {
+          if (this.standard === TokenStandard.CwHypSynthetic && this.collateralAddressOrDenom) {
+            return new CwHypSyntheticAdapter(this.chainName, multiProviderArg, {
+              warpRouter: this.addressOrDenom,
+              token: this.collateralAddressOrDenom,
+            });
+          }
+          return originalGetHypAdapter(multiProviderArg, destination);
+        };
+
+        patchedCount++;
+
+        logger.info(
+          `✅ Applied custom SYNTHETIC adapter override to token ${token.symbol} on ${token.chainName} (warpRouter: ${token.addressOrDenom})`,
+        );
+      } catch (error) {
+        logger.error(
+          `❌ Error applying custom synthetic adapter to token ${token.symbol} on ${token.chainName}:`,
           error,
         );
       }

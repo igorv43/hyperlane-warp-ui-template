@@ -13,19 +13,13 @@
 import {
   CwHypCollateralAdapter as SDKCwHypCollateralAdapter,
   CwHypNativeAdapter as SDKCwHypNativeAdapter,
+  CwHypSyntheticAdapter as SDKCwHypSyntheticAdapter,
   CwNativeTokenAdapter as SDKCwNativeTokenAdapter,
 } from '@hyperlane-xyz/sdk';
 import type { Address } from '@hyperlane-xyz/utils';
 import { addressToBytes32, strip0x } from '@hyperlane-xyz/utils';
+import { COSMOS_IGP } from '../../consts/cosmosIgp';
 import { logger } from '../../utils/logger';
-
-/**
- * IGP of each Cosmos chain (infra address — the fee VALUES are quoted
- * on-chain at the time, dynamic, as already happens on BSC/ETH/Solana).
- */
-const COSMOS_IGP: Record<string, string> = {
-  terraclassic: 'terra1taunhg629rssf3g939nqr0h594q5mssrzdj5lkx2hygmxmh72ghqeqqnvz',
-};
 
 /**
  * Quotes the Cosmos IGP on-chain: reads the gas charged for the domain (gas_for_domain,
@@ -70,6 +64,18 @@ async function quoteCosmosIgp(
  * which throws "not implemented" — here we quote the IGP on-chain, as with CW20.
  */
 export class CwHypNativeAdapter extends SDKCwHypNativeAdapter {
+  /** Dynamic IGP quoting (the SDK throws "not implemented" for CW). */
+  async quoteTransferRemoteGas({ destination }: { destination: number }): Promise<any> {
+    return quoteCosmosIgp(this.chainName, await this.getProvider(), destination);
+  }
+}
+
+/**
+ * Custom CwHypSyntheticAdapter (CW20 synthetic minted by the warp router, e.g.
+ * WBTC/WETH/PAXG/wSPYx on Terra Classic). The SDK throws "not implemented" in
+ * quoteTransferRemoteGas — quote the IGP on-chain like the other CW standards.
+ */
+export class CwHypSyntheticAdapter extends SDKCwHypSyntheticAdapter {
   /** Dynamic IGP quoting (the SDK throws "not implemented" for CW). */
   async quoteTransferRemoteGas({ destination }: { destination: number }): Promise<any> {
     return quoteCosmosIgp(this.chainName, await this.getProvider(), destination);

@@ -12,6 +12,7 @@ import {
 } from '@hyperlane-xyz/sdk';
 import { isObjEmpty, objFilter, objMerge } from '@hyperlane-xyz/utils';
 import { config } from '../../consts/config.ts';
+import { hasDynamicCosmosIgp } from '../../consts/cosmosIgp.ts';
 import { warpRouteWhitelist } from '../../consts/warpRouteWhitelist.ts';
 import { warpRouteConfigs as tsWarpRoutes } from '../../consts/warpRoutes.ts';
 import yamlWarpRoutes from '../../consts/warpRoutes.yaml';
@@ -82,7 +83,7 @@ export async function assembleWarpCoreConfig(
     yamlConfig.options,
     ...storeOverrideOptions,
   ];
-  const options = reduceOptions(combinedOptions);
+  const options = dropStaticFeesForDynamicIgp(reduceOptions(combinedOptions));
 
   if (!tokens.length)
     throw new Error(
@@ -143,6 +144,21 @@ function dedupeTokens(tokens: WarpCoreConfig['tokens']): WarpCoreConfig['tokens'
     idToToken[id] = objMerge(idToToken[id] || {}, token);
   }
   return Object.values(idToToken);
+}
+
+// WarpCore uses a matching `interchainFeeConstants` entry INSTEAD of asking the
+// adapter for a quote. For origins whose IGP is quoted on-chain (Terra Classic)
+// a static amount from the registry goes stale as soon as the gas oracle moves,
+// and the transfer then fails. Drop those entries so the live quote is used.
+export function dropStaticFeesForDynamicIgp(
+  options: WarpCoreConfig['options'],
+): WarpCoreConfig['options'] {
+  if (!options?.interchainFeeConstants?.length) return options;
+  const kept = options.interchainFeeConstants.filter((c) => !hasDynamicCosmosIgp(c.origin));
+  const dropped = options.interchainFeeConstants.length - kept.length;
+  if (dropped > 0)
+    logger.debug(`Ignoring ${dropped} static interchain fee constant(s): quoted on-chain instead`);
+  return { ...options, interchainFeeConstants: kept };
 }
 
 // Combine a list of WarpCore option objects into one single options object
